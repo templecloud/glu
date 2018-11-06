@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"os"
+
+	"github.com/templecloud/glu/pkg/repl"
+)
 
 func main() {
-	fmt.Println("Glu - v0.0.0")
+	repl.Start(os.Stdin, os.Stdout)
 }
