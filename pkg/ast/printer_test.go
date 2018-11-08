@@ -6,13 +6,13 @@ import (
 	"github.com/templecloud/glu/pkg/token"
 )
 
-func TestScanTokens_Structural(t *testing.T) {
+func TestAst_Printer(t *testing.T) {
 	expr := NewBinary(
 		NewUnary(
-			*token.New(token.Minus, "-", "", 0, 0),
+			token.New(token.Minus, "-", "", 0, 0),
 			NewLiteral("123"),
 		),
-		*token.New(token.Star, "*", "", 0, 0),
+		token.New(token.Star, "*", "", 0, 0),
 		NewLiteral("123"),
 	)
 	printer := Printer{}

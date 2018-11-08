@@ -30,12 +30,12 @@ type Expr interface {
 // Binary expression node.
 type Binary struct {
 	left     Expr
-	operator token.Token
+	operator *token.Token
 	right    Expr
 }
 
 // NewBinary constructor.
-func NewBinary(left Expr, operator token.Token, right Expr) *Binary {
+func NewBinary(left Expr, operator *token.Token, right Expr) *Binary {
 	return &Binary{left: left, operator: operator, right: right}
 }
 
@@ -82,12 +82,12 @@ func (l *Literal) accept(visitor Visitor) interface{} {
 
 // Unary expression node.
 type Unary struct {
-	operator token.Token
+	operator *token.Token
 	right    Expr
 }
 
 // NewUnary constructor.
-func NewUnary(operator token.Token, right Expr) *Unary {
+func NewUnary(operator *token.Token, right Expr) *Unary {
 	return &Unary{operator: operator, right: right}
 }
 
