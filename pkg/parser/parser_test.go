@@ -8,15 +8,30 @@ import (
 )
 
 func TestParse_Expression(t *testing.T) {
-	input := "-123 * 123"
-	l := lexer.New(input)
-	tokens, _ := l.ScanTokens()
-	p := New(tokens)
-	expr := p.Parse()
-	printer := ast.Printer{}
-	output := printer.Print(expr)
-	expected := "(* (- 123) 123)"
-	if expected != output {
-		t.Fatalf("test[1] - . Expected=%q, got=%q", expected, output)
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"123", "123"},
+		{"-123", "(- 123)"},
+		{"123 + 123", "(+ 123 123)"},
+		{"123 - 123", "(- 123 123)"},
+		{"123 * 123", "(* 123 123)"},
+		{"123 / 123", "(/ 123 123)"},
+		{"-123 * 123", "(* (- 123) 123)"},
+		{"(-123 * 123)", "(#g (* (- 123) 123))"},
+		{"(-123 * 123) / (123 - 123)", "(/ (#g (* (- 123) 123)) (#g (- 123 123)))"},
 	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		expr := p.Parse()
+		printer := ast.Printer{}
+		actual := printer.Print(expr)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+
 }
