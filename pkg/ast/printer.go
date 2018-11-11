@@ -16,28 +16,35 @@ type Printer struct {
 // Print recursively traverses the specified Expr and returns a string
 // representation.
 func (p *Printer) Print(expr Expr) string {
-	return expr.accept(p).(string)
+	return expr.Accept(p).(string)
 }
 
-func (p *Printer) visitBinaryExpr(expr *Binary) interface{} {
-	return p.parenthesize(expr.operator.Lexeme, expr.left, expr.right)
+// VisitBinaryExpr returns a string representation of the node.
+func (p *Printer) VisitBinaryExpr(expr *Binary) interface{} {
+	return p.parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right)
 }
 
-func (p *Printer) visitGroupingExpr(expr *Grouping) interface{} {
-	return p.parenthesize("#g", expr.expr)
+// VisitGroupingExpr returns a string representation of the node.
+func (p *Printer) VisitGroupingExpr(expr *Grouping) interface{} {
+	return p.parenthesize("#g", expr.Expr)
 }
 
-// visitLiteralExpr terminates recursion.
-func (p *Printer) visitLiteralExpr(expr *Literal) interface{} {
-	if expr.value == nil {
+// VisitLiteralExpr returns a string representation of the node.
+// Terminates recursion.
+func (p *Printer) VisitLiteralExpr(expr *Literal) interface{} {
+	if expr.Value == nil {
 		return "nil"
 	}
-	return fmt.Sprintf("%+v", expr.value)
+	return fmt.Sprintf("%+v", expr.Value)
 }
 
-func (p *Printer) visitUnaryExpr(expr *Unary) interface{} {
-	return p.parenthesize(expr.operator.Lexeme, expr.right)
+// VisitUnaryExpr returns a string representation of the node.
+func (p *Printer) VisitUnaryExpr(expr *Unary) interface{} {
+	return p.parenthesize(expr.Operator.Lexeme, expr.Right)
 }
+
+// Support Functions ==========================================================
+//
 
 // parenthesize adds grouping parenthese and recursively calls 'accept'.
 func (p *Printer) parenthesize(name string, exprs ...Expr) string {
@@ -46,7 +53,7 @@ func (p *Printer) parenthesize(name string, exprs ...Expr) string {
 	builder.WriteString(name)
 	for _, expr := range exprs {
 		builder.WriteString(" ")
-		builder.WriteString(expr.accept(p).(string))
+		builder.WriteString(expr.Accept(p).(string))
 	}
 	builder.WriteString(")")
 

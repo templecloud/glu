@@ -10,10 +10,10 @@ import (
 // Visitor represents the GoF 'visitor' design pattern. Ideally, it would be
 // parameterized, but, we will need to wait for golang generic types for that!
 type Visitor interface {
-	visitBinaryExpr(b *Binary) interface{}
-	visitGroupingExpr(g *Grouping) interface{}
-	visitLiteralExpr(l *Literal) interface{}
-	visitUnaryExpr(u *Unary) interface{}
+	VisitBinaryExpr(b *Binary) interface{}
+	VisitGroupingExpr(g *Grouping) interface{}
+	VisitLiteralExpr(l *Literal) interface{}
+	VisitUnaryExpr(u *Unary) interface{}
 }
 
 // Expr =======================================================================
@@ -21,7 +21,7 @@ type Visitor interface {
 
 // Expr is (currently) the root abstract AST node type.
 type Expr interface {
-	accept(visitor Visitor) interface{}
+	Accept(visitor Visitor) interface{}
 }
 
 // Binary =====================================================================
@@ -29,18 +29,19 @@ type Expr interface {
 
 // Binary expression node.
 type Binary struct {
-	left     Expr
-	operator *token.Token
-	right    Expr
+	Left     Expr
+	Operator *token.Token
+	Right    Expr
 }
 
 // NewBinary constructor.
 func NewBinary(left Expr, operator *token.Token, right Expr) *Binary {
-	return &Binary{left: left, operator: operator, right: right}
+	return &Binary{Left: left, Operator: operator, Right: right}
 }
 
-func (b *Binary) accept(visitor Visitor) interface{} {
-	return visitor.visitBinaryExpr(b)
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (b *Binary) Accept(visitor Visitor) interface{} {
+	return visitor.VisitBinaryExpr(b)
 }
 
 // Grouping ===================================================================
@@ -48,16 +49,17 @@ func (b *Binary) accept(visitor Visitor) interface{} {
 
 // Grouping expression node.
 type Grouping struct {
-	expr Expr
+	Expr
 }
 
 // NewGrouping constructor.
 func NewGrouping(expr Expr) *Grouping {
-	return &Grouping{expr: expr}
+	return &Grouping{Expr: expr}
 }
 
-func (g *Grouping) accept(visitor Visitor) interface{} {
-	return visitor.visitGroupingExpr(g)
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (g *Grouping) Accept(visitor Visitor) interface{} {
+	return visitor.VisitGroupingExpr(g)
 }
 
 // Literal ====================================================================
@@ -65,16 +67,17 @@ func (g *Grouping) accept(visitor Visitor) interface{} {
 
 // Literal expression node.
 type Literal struct {
-	value interface{}
+	Value interface{}
 }
 
 // NewLiteral constructor.
 func NewLiteral(value interface{}) *Literal {
-	return &Literal{value: value}
+	return &Literal{Value: value}
 }
 
-func (l *Literal) accept(visitor Visitor) interface{} {
-	return visitor.visitLiteralExpr(l)
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (l *Literal) Accept(visitor Visitor) interface{} {
+	return visitor.VisitLiteralExpr(l)
 }
 
 // Unary ======================================================================
@@ -82,15 +85,16 @@ func (l *Literal) accept(visitor Visitor) interface{} {
 
 // Unary expression node.
 type Unary struct {
-	operator *token.Token
-	right    Expr
+	Operator *token.Token
+	Right    Expr
 }
 
 // NewUnary constructor.
 func NewUnary(operator *token.Token, right Expr) *Unary {
-	return &Unary{operator: operator, right: right}
+	return &Unary{Operator: operator, Right: right}
 }
 
-func (u *Unary) accept(visitor Visitor) interface{} {
-	return visitor.visitUnaryExpr(u)
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (u *Unary) Accept(visitor Visitor) interface{} {
+	return visitor.VisitUnaryExpr(u)
 }
