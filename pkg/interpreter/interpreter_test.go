@@ -37,14 +37,13 @@ func TestEvaluate_Expression(t *testing.T) {
 		{"2 / 2", float64(1), "float64"},
 		{"2 / 1", float64(2), "float64"},
 		{"2 / (1 / 2)", float64(4), "float64"},
-		// TODO
+		// TODO: +Inf
 		// {"2 / 0", float64(4), "float64"},
 
 		{" 1 == 1", true, "bool"},
 		{" 1 == 2", false, "bool"},
-		// TODO
-		// {" 1 != 1", false, "bool"}
-		// {" 1 != 2", true, "bool"},
+		{" 1 != 1", false, "bool"},
+		{" 1 != 2", true, "bool"},
 		{" 2 > 1", true, "bool"},
 		{" 1 > 1", false, "bool"},
 		{" 1 >= 1", true, "bool"},

@@ -8,6 +8,7 @@ Things to do next.
 * Add 'lexeme length' to location.
 * Improve representation.
 * Review current Lexemes.
+* Adds support for EOF.
 
 ---
 
@@ -15,12 +16,11 @@ Things to do next.
 * Add 'panic' error handling into parser and 'recovery' function.
 * Add more tests.
 * Add 'numeral' node type.
-
+* Adds support for EOF.
 ---
 
 #### Interpreter
 * Add 'error' checking mechanism.
-* Fix the '!=' error.
 * Handle 'division by 0'. 
 * Add 'numeral' node type.
 

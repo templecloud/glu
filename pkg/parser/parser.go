@@ -33,7 +33,7 @@ func (p *Parser) expression() ast.Expr {
 
 func (p *Parser) equality() ast.Expr {
 	expr := p.comparison()
-	for p.match(token.EqualEqual, token.EqualEqual) {
+	for p.match(token.EqualEqual, token.NotEqual) {
 		operator := p.previous()
 		right := p.comparison()
 		expr = ast.NewBinary(expr, operator, right)
