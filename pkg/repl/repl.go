@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/templecloud/glu/pkg/ast"
+	"github.com/templecloud/glu/pkg/interpreter"
 	"github.com/templecloud/glu/pkg/lexer"
+	"github.com/templecloud/glu/pkg/parser"
 )
 
 // Prompt is the REPL prompt.
@@ -21,17 +24,18 @@ func Start(in io.Reader, out io.Writer) {
 
 	scanner := bufio.NewScanner(in)
 	for {
+		// Read
 		fmt.Printf(Prompt)
 		ok := scanner.Scan()
 		if !ok {
 			return
 		}
-
 		input := scanner.Text()
 		if input == "exit" {
 			return
 		}
 
+		// Lexer
 		l := lexer.New(input)
 		tokens, errors := l.ScanTokens()
 		for idx, token := range tokens {
@@ -40,5 +44,17 @@ func Start(in io.Reader, out io.Writer) {
 		for idx, err := range errors {
 			fmt.Printf("err[%d]: %+v\n", idx, err)
 		}
+
+		// Parser
+		p := parser.New(tokens)
+		expr := p.Parse()
+		printer := ast.Printer{}
+		exprStr := printer.Print(expr)
+		fmt.Printf("expr   : %s\n", exprStr)
+
+		// Evaluate
+		i := interpreter.Interpreter{}
+		result := i.Evaluate(expr)
+		fmt.Printf("result : %v\n", result)
 	}
 }
