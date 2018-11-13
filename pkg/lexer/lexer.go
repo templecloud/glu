@@ -303,7 +303,8 @@ func (l *Lexer) peekNext() rune {
 //
 
 func (l *Lexer) createToken(tokenType token.Type, lexeme string) *token.Token {
-	return token.New(tokenType, lexeme, l.origin, l.line, l.column-len(lexeme))
+	ll := len(lexeme)
+	return token.New(tokenType, lexeme, l.origin, l.line, l.column-ll, ll)
 }
 
 func (l *Lexer) createError(message string) *Error {

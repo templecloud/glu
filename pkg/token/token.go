@@ -5,6 +5,7 @@ type Source struct {
 	Origin string
 	Line   int
 	Column int
+	Length int
 }
 
 // Tokens =====================================================================
@@ -20,9 +21,25 @@ type Token struct {
 	Source
 }
 
-// Create a new token.
-func New(tokenType Type, lexeme string, origin string, line int, column int) *Token {
-	return &Token{tokenType, lexeme, Source{origin, line, column}}
+// New creates a new token.
+func New(
+	tokenType Type,
+	lexeme string,
+	origin string,
+	line int,
+	column int,
+	length int,
+) *Token {
+	return &Token{
+		tokenType,
+		lexeme,
+		Source{
+			Origin: origin,
+			Line:   line,
+			Column: column,
+			Length: length,
+		},
+	}
 }
 
 // Structural tokens.

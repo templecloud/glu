@@ -9,10 +9,10 @@ import (
 func TestAst_Printer(t *testing.T) {
 	expr := NewBinary(
 		NewUnary(
-			token.New(token.Minus, "-", "", 0, 0),
+			&token.Token{Type: token.Minus, Lexeme: "-"},
 			NewLiteral("123"),
 		),
-		token.New(token.Star, "*", "", 0, 0),
+		&token.Token{Type: token.Star, Lexeme: "*"},
 		NewLiteral("123"),
 	)
 	printer := Printer{}
