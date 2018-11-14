@@ -44,41 +44,41 @@ func New(
 
 // Structural tokens.
 const (
-	LeftParen  = "("
-	RightParen = ")"
-	LeftBrace  = "{"
-	RightBrace = "}"
-	Comma      = ","
-	Dot        = "."
-	Semicolon  = ";"
+	LeftParen  = "LeftParen"  // "("
+	RightParen = "RightParen" // ")"
+	LeftBrace  = "LeftBrace"  // "{"
+	RightBrace = "RightBrace" // "}"
+	Comma      = "Comma"      // ","
+	Dot        = "Dot"        // "."
+	Semicolon  = "Semicolon"  // ";"
 	l
 )
 
 // Arithmetic operators.
 const (
-	Minus        = "-"
-	Plus         = "+"
-	ForwardSlash = "/"
-	Star         = "*"
+	Minus        = "Minus"        // "-"
+	Plus         = "Plus"         // "+"
+	ForwardSlash = "ForwardSlash" // "/"
+	Star         = "Star"         // "*"
 )
 
 // Comparison operators.
 const (
-	Not                = "!"
-	NotEqual           = "!="
-	Equal              = "="
-	EqualEqual         = "=="
-	GreaterThan        = ">"
-	GreaterThanOrEqual = ">="
-	LessThan           = "<"
-	LessThanOrEqual    = "<="
+	Not                = "Not"                // "!"
+	NotEqual           = "NotEqual"           // "!="
+	Equal              = "Equal"              // "="
+	EqualEqual         = "EqualEqual"         // ""=="
+	GreaterThan        = "GreaterThan"        // ">"
+	GreaterThanOrEqual = "GreaterThanOrEqual" // ">="
+	LessThan           = "LessThan"           // "<"
+	LessThanOrEqual    = "LessThanOrEqual"    // "<="
 )
 
 // Literals.
 const (
-	Identifier = "identifier"
-	String     = "string"
-	Number     = "number"
+	Identifier = "Identifier"
+	String     = "String"
+	Number     = "Number"
 )
 
 // Keywords.
@@ -86,8 +86,8 @@ const (
 	Nil    = "nil"
 	True   = "true"
 	False  = "false"
-	And    = "and"
-	Or     = "or"
+	And    = "and" // "&&"
+	Or     = "or"  // "||"
 	If     = "if"
 	Else   = "else"
 	While  = "while"
