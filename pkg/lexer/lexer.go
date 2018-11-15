@@ -19,7 +19,8 @@ type Error struct {
 
 // Lexer takes an input strings and attempts to decompose it into tokens.
 type Lexer struct {
-	input []rune
+	config Config
+	input  []rune
 	// scan state
 	origin  string
 	start   int
@@ -28,9 +29,21 @@ type Lexer struct {
 	column  int
 }
 
-// New creates an instance of a Lexer for the specified input string.
+// New creates a default instance of a Lexer for the specified input string.
 func New(input string) *Lexer {
-	return &Lexer{input: []rune(input), start: 0, current: 0, column: 0}
+	return &Lexer{
+		config: defaultConfig(),
+		input:  []rune(input),
+		start:  0, current: 0, column: 0}
+}
+
+// NewWithConfig creates a configured instance of a Lexer for the specified
+// input string.
+func NewWithConfig(input string, config Config) *Lexer {
+	return &Lexer{
+		config: config,
+		input:  []rune(input),
+		start:  0, current: 0, column: 0}
 }
 
 // Lexical Functions ==========================================================
@@ -49,6 +62,9 @@ func (l *Lexer) ScanTokens() ([]*token.Token, []*Error) {
 		if t != nil {
 			tokenz = append(tokenz, t)
 		}
+	}
+	if l.config.autoEOFToken {
+		tokenz = append(tokenz, l.createToken(token.EOF, ""))
 	}
 	return tokenz, errors
 }
