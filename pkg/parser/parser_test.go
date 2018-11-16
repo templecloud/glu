@@ -33,5 +33,27 @@ func TestParse_Expression(t *testing.T) {
 			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
 		}
 	}
-
 }
+
+func TestParse_ExpressionFailure(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"(1 + ", "Token failed to match any rule."},
+		{"(1 + 1", "Expect ')' after expression."},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		p.Parse()
+		actualErrorMessage := p.Errors[0].message
+		if tt.expected != actualErrorMessage {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actualErrorMessage)
+		}
+	}
+}
+
+// {&{Type:EOF Lexeme: Source:{Origin: Line:0 Column:5 Length:0}}, Token failed to match any rule.}
+// {&{Type:EOF Lexeme: Source:{Origin: Line:0 Column:6 Length:0}}, Expect ')' after expression.}

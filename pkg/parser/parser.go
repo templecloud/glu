@@ -8,6 +8,7 @@ import (
 // Parser parses expression from a set of tokens.
 type Parser struct {
 	tokens  []*token.Token
+	Errors  []*Error
 	current int
 }
 
@@ -18,12 +19,19 @@ func New(tokens []*token.Token) *Parser {
 
 // Parse an expression from the Parser tokens.
 func (p *Parser) Parse() ast.Expr {
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		err := r.(error)
-	// 		fmt.Printf("Error: %+v\n", err)
-	// 	}
-	// }()
+	defer func() {
+		if r := recover(); r != nil {
+			switch err := r.(type) {
+			case *Error:
+				// If parser error detected panic try and recover
+				p.Errors = append(p.Errors, err)
+				// try to recover
+			default:
+				// Else, continue generic runtime error.
+				panic(err)
+			}
+		}
+	}()
 	return p.expression()
 }
 
@@ -98,21 +106,17 @@ func (p *Parser) primary() ast.Expr {
 		p.consume(token.RightParen, "Expect ')' after expression.")
 		return ast.NewGrouping(expr)
 	}
-	// TODO: Panic or handle better?
-	return nil
+	panic(NewError(p.tokens[p.current], "Token failed to match any rule."))
 }
 
-//=============================================================================
+// Parser Cursor Functions ====================================================
 
 func (p *Parser) consume(tt token.Type, message string) *token.Token {
 	if p.check(tt) {
 		return p.advance()
 	}
-	return nil
-	// panic(NewError(p.peek(), message))
+	panic(NewError(p.peek(), message))
 }
-
-// Parser Cursor Functions ====================================================
 
 func (p *Parser) match(tts ...token.Type) bool {
 	for _, tt := range tts {
@@ -139,9 +143,7 @@ func (p *Parser) advance() *token.Token {
 }
 
 func (p *Parser) isAtEnd() bool {
-	return p.current == len(p.tokens)
-	// TODO: Add EOF token.
-	// return p.peek().Type == token.EOF
+	return p.peek().Type == token.EOF || p.current == len(p.tokens)
 }
 
 func (p *Parser) peek() *token.Token {

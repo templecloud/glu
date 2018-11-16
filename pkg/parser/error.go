@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/templecloud/glu/pkg/token"
 )
 
@@ -17,4 +19,8 @@ type Error struct {
 // NewError create an parse error.
 func NewError(token *token.Token, message string) *Error {
 	return &Error{token: token, message: message}
+}
+
+func (e Error) Error() string {
+	return fmt.Sprintf("{%+v, %s}\n", e.token, e.message)
 }

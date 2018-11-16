@@ -5,18 +5,15 @@ Things to do next.
 ---
 
 #### Lexer
-* Add 'lexeme length' to location.
 * Improve representation.
 * Review current Lexemes.
-* Adds support for EOF.
 
 ---
 
 #### AST + Parser
-* Add 'panic' error handling into parser and 'recovery' function.
+* Add recovery' function.
 * Add more tests.
 * Add 'numeral' node type.
-* Adds support for EOF.
 ---
 
 #### Interpreter

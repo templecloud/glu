@@ -42,19 +42,29 @@ func Start(in io.Reader, out io.Writer) {
 			fmt.Printf("token[%d]: %+v\n", idx, token)
 		}
 		for idx, err := range errors {
-			fmt.Printf("err[%d]: %+v\n", idx, err)
+			fmt.Printf("error[%d]: %+v\n", idx, err)
 		}
 
 		// Parser
 		p := parser.New(tokens)
 		expr := p.Parse()
-		printer := ast.Printer{}
-		exprStr := printer.Print(expr)
-		fmt.Printf("expr   : %s\n", exprStr)
+		if len(p.Errors) > 0 {
+			for idx, err := range p.Errors {
+				fmt.Printf("error[%d]: %+v", idx, err)
+			}
+		} else {
+			printer := ast.Printer{}
+			exprStr := printer.Print(expr)
+			if exprStr != "" {
+				fmt.Printf("expr   : %s\n", exprStr)
+			} else {
+				fmt.Printf("Error: Nothing to print.")
+			}
 
-		// Evaluate
-		i := interpreter.Interpreter{}
-		result := i.Evaluate(expr)
-		fmt.Printf("result : %v\n", result)
+			// Evaluate
+			i := interpreter.Interpreter{}
+			result := i.Evaluate(expr)
+			fmt.Printf("result : %v\n", result)
+		}
 	}
 }
