@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/templecloud/glu/pkg/ast"
 	"github.com/templecloud/glu/pkg/token"
 )
@@ -19,20 +21,24 @@ func New(tokens []*token.Token) *Parser {
 
 // Parse an expression from the Parser tokens.
 func (p *Parser) Parse() ast.Expr {
-	defer func() {
-		if r := recover(); r != nil {
-			switch err := r.(type) {
-			case *Error:
-				// If parser error detected panic try and recover
-				p.Errors = append(p.Errors, err)
-				// try to recover
-			default:
-				// Else, continue generic runtime error.
-				panic(err)
+	var expr ast.Expr
+	for !p.isAtEnd() {
+		defer func() {
+			if r := recover(); r != nil {
+				switch err := r.(type) {
+				case *Error:
+					// If parser error detected panic try and recover
+					p.Errors = append(p.Errors, err)
+					p.synchronize()
+				default:
+					// Else, continue generic runtime error.
+					panic(err)
+				}
 			}
-		}
-	}()
-	return p.expression()
+		}()
+		expr = p.expression()
+	}
+	return expr
 }
 
 func (p *Parser) expression() ast.Expr {
@@ -152,4 +158,29 @@ func (p *Parser) peek() *token.Token {
 
 func (p *Parser) previous() *token.Token {
 	return p.tokens[p.current-1]
+}
+
+// Parser Synchronisation Functions ===========================================
+
+// synchronize scans the cursor in the input stream until it finds a known
+// point to start/continue parsing.
+func (p *Parser) synchronize() {
+	p.advance()
+
+	for !p.isAtEnd() {
+		if p.previous().Type == token.Semicolon {
+			return
+		}
+		switch p.peek().Type {
+		case token.Func:
+		case token.Let:
+		case token.For:
+		case token.If:
+		case token.While:
+		case token.Log:
+		case token.Return:
+			return
+		}
+		p.advance()
+	}
 }
