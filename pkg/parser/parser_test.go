@@ -40,7 +40,9 @@ func TestParse_ExpressionFailure(t *testing.T) {
 		input    string
 		expected string
 	}{
+		// {&{Type:EOF Lexeme: Source:{Origin: Line:0 Column:5 Length:0}}, Token failed to match any rule.}
 		{"(1 + ", "Token failed to match any rule."},
+		// {&{Type:EOF Lexeme: Source:{Origin: Line:0 Column:6 Length:0}}, Expect ')' after expression.}
 		{"(1 + 1", "Expect ')' after expression."},
 	}
 	for idx, tt := range tests {
@@ -55,5 +57,3 @@ func TestParse_ExpressionFailure(t *testing.T) {
 	}
 }
 
-// {&{Type:EOF Lexeme: Source:{Origin: Line:0 Column:5 Length:0}}, Token failed to match any rule.}
-// {&{Type:EOF Lexeme: Source:{Origin: Line:0 Column:6 Length:0}}, Expect ')' after expression.}

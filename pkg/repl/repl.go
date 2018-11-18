@@ -34,37 +34,42 @@ func Start(in io.Reader, out io.Writer) {
 		if input == "exit" {
 			return
 		}
+		Exec(input)
 
-		// Lexer
-		l := lexer.New(input)
-		tokens, errors := l.ScanTokens()
-		for idx, token := range tokens {
-			fmt.Printf("token[%d]: %+v\n", idx, token)
-		}
-		for idx, err := range errors {
-			fmt.Printf("error[%d]: %+v\n", idx, err)
-		}
+	}
+}
 
-		// Parser
-		p := parser.New(tokens)
-		expr := p.Parse()
-		if len(p.Errors) > 0 {
-			for idx, err := range p.Errors {
-				fmt.Printf("error[%d]: %+v", idx, err)
-			}
+// Exec tokenizes, parses, and, executes the specified input string.
+func Exec(input string) {
+	// Lexer
+	l := lexer.New(input)
+	tokens, errors := l.ScanTokens()
+	for idx, token := range tokens {
+		fmt.Printf("token[%d]: %+v\n", idx, token)
+	}
+	for idx, err := range errors {
+		fmt.Printf("error[%d]: %+v\n", idx, err)
+	}
+
+	// Parser
+	p := parser.New(tokens)
+	expr := p.Parse()
+	if len(p.Errors) > 0 {
+		for idx, err := range p.Errors {
+			fmt.Printf("error[%d]: %+v", idx, err)
+		}
+	} else {
+		printer := ast.Printer{}
+		exprStr := printer.Print(expr)
+		if exprStr != "" {
+			fmt.Printf("expr   : %s\n", exprStr)
 		} else {
-			printer := ast.Printer{}
-			exprStr := printer.Print(expr)
-			if exprStr != "" {
-				fmt.Printf("expr   : %s\n", exprStr)
-			} else {
-				fmt.Printf("Error: Nothing to print.")
-			}
-
-			// Evaluate
-			i := interpreter.Interpreter{}
-			result := i.Evaluate(expr)
-			fmt.Printf("result : %v\n", result)
+			fmt.Printf("Error: Nothing to print.")
 		}
+
+		// Evaluate
+		i := interpreter.Interpreter{}
+		result := i.Evaluate(expr)
+		fmt.Printf("result : %v\n", result)
 	}
 }

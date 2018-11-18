@@ -19,7 +19,7 @@ build: init
 
 .PHONY: run
 run: build
-	./$(DIST)/$(BINARY)
+	./$(DIST)/$(BINARY) repl
 
 .PHONY: test
 test:

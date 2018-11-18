@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/templecloud/glu/pkg/ast"
 	"github.com/templecloud/glu/pkg/token"
 )
