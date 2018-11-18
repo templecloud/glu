@@ -35,7 +35,6 @@ func Start(in io.Reader, out io.Writer) {
 			return
 		}
 		Exec(input)
-
 	}
 }
 
