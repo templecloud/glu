@@ -11,15 +11,32 @@ import (
 	"github.com/templecloud/glu/pkg/parser"
 )
 
-// Prompt is the REPL prompt.
-const Prompt = "glu> "
+const (
+	// Prompt is the REPL prompt.
+	Prompt = "glu> "
+	// Version is the current semantic version.
+	version  = "0.0.1"
+	exit     = "exit"
+	debugOn  = "debug.on"
+	debugOff = "debug.off"
+)
 
-// Version is the current semantic version.
-const Version = "0.0.1"
+// Repl ===================================================================
+//
+
+// Repl is a 'Read Evaluate Print loop' for Glu statements.
+type Repl struct {
+	config
+}
+
+// New creates a new default Repl.
+func New() *Repl {
+	return &Repl{config: defaultConfig()}
+}
 
 // Start begins a new REPL session.
-func Start(in io.Reader, out io.Writer) {
-	fmt.Printf("Glu v%s", Version)
+func (r *Repl) Start(in io.Reader, out io.Writer) {
+	fmt.Printf("Glu %s\n", version)
 	fmt.Println("Type 'exit' to exit.")
 
 	scanner := bufio.NewScanner(in)
@@ -31,44 +48,74 @@ func Start(in io.Reader, out io.Writer) {
 			return
 		}
 		input := scanner.Text()
-		if input == "exit" {
+		if input == exit {
 			return
 		}
-		Exec(input)
+		if input == debugOn {
+			r.config.debug = fullDebug()
+			continue
+		}
+		if input == debugOff {
+			r.config.debug = defaultDebug()
+			continue
+		}
+		r.Exec(input)
 	}
 }
 
 // Exec tokenizes, parses, and, executes the specified input string.
-func Exec(input string) {
+func (r *Repl) Exec(input string) {
 	// Lexer
 	l := lexer.New(input)
 	tokens, errors := l.ScanTokens()
 	for idx, token := range tokens {
-		fmt.Printf("token[%d]: %+v\n", idx, token)
+		if r.config.tokenHeader {
+			fmt.Printf("token[%d]: ", idx)
+		}
+		if r.config.token {
+			fmt.Printf("%+v\n", token)
+		}
 	}
-	for idx, err := range errors {
-		fmt.Printf("error[%d]: %+v\n", idx, err)
+	for idx, tokenErr := range errors {
+		if r.config.tokenErrHeader {
+			fmt.Printf("t_err[%d]: ", idx)
+		}
+		if r.config.tokenErr {
+			fmt.Printf("%+v\n", tokenErr)
+		}
 	}
 
 	// Parser
 	p := parser.New(tokens)
 	expr := p.Parse()
 	if len(p.Errors) > 0 {
-		for idx, err := range p.Errors {
-			fmt.Printf("error[%d]: %+v", idx, err)
+		for idx, parserErr := range p.Errors {
+			if r.config.parseErrHeader {
+				fmt.Printf("p_err[%d]: ", idx)
+			}
+			if r.config.parseErr {
+				fmt.Printf("%+v\n", parserErr)
+			}
 		}
 	} else {
 		printer := ast.Printer{}
 		exprStr := printer.Print(expr)
-		if exprStr != "" {
-			fmt.Printf("expr   : %s\n", exprStr)
-		} else {
-			fmt.Printf("Error: Nothing to print.")
+
+		if r.config.exprHeader {
+			fmt.Printf("expr   :")
+		}
+		if r.config.expr {
+			fmt.Printf("%s\n", exprStr)
 		}
 
 		// Evaluate
 		i := interpreter.Interpreter{}
 		result := i.Evaluate(expr)
-		fmt.Printf("result : %v\n", result)
+		if r.config.resultHeader {
+			fmt.Printf("result : ")
+		}
+		if r.config.result {
+			fmt.Printf("%v\n", result)
+		}
 	}
 }

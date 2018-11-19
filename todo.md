@@ -14,6 +14,8 @@ Things to do next.
 * Add recovery' function.
 * Add more tests.
 * Add 'numeral' node type.
+* Fix crash for non-token
+
 ---
 
 #### Interpreter
