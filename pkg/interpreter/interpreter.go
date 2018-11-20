@@ -13,11 +13,24 @@ import (
 // Interpreter is an implementation of a Visitor that evaluates the statements
 // and expressions it parses.
 type Interpreter struct {
+	Errors []*Error
 }
 
 // Evaluate recursively traverses the specified Expr and returns a string
 // representation.
 func (i *Interpreter) Evaluate(expr ast.Expr) interface{} {
+	defer func() {
+		if r := recover(); r != nil {
+			switch err := r.(type) {
+			case *Error:
+				// If evaluation error is detected panic try and recover
+				i.Errors = append(i.Errors, err)
+			default:
+				// Else, continue generic runtime error.
+				panic(err)
+			}
+		}
+	}()
 	return expr.Accept(i)
 }
 
@@ -29,12 +42,16 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.Binary) interface{} {
 	switch expr.Operator.Type {
 	// Compators
 	case token.GreaterThan:
+		checkNumberOperands(expr.Operator, left, right)
 		return left.(float64) > right.(float64)
 	case token.GreaterThanOrEqual:
+		checkNumberOperands(expr.Operator, left, right)
 		return left.(float64) >= right.(float64)
 	case token.LessThan:
+		checkNumberOperands(expr.Operator, left, right)
 		return left.(float64) < right.(float64)
 	case token.LessThanOrEqual:
+		checkNumberOperands(expr.Operator, left, right)
 		return left.(float64) <= right.(float64)
 	// Equality
 	case token.NotEqual:
@@ -44,12 +61,16 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.Binary) interface{} {
 	// Arithmetic
 	case token.Plus:
 		// TODO: Handle Strings
+		checkNumberOperands(expr.Operator, left, right)
 		return left.(float64) + right.(float64)
 	case token.Minus:
+		checkNumberOperands(expr.Operator, left, right)
 		return left.(float64) - right.(float64)
 	case token.ForwardSlash:
+		checkNumberOperands(expr.Operator, left, right)
 		return left.(float64) / right.(float64)
 	case token.Star:
+		checkNumberOperands(expr.Operator, left, right)
 		return left.(float64) * right.(float64)
 	}
 	// Unreachable.
@@ -81,9 +102,33 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.Unary) interface{} {
 	case token.Not:
 		return !isTruthy(right)
 	case token.Minus:
+		checkNumberOperand(expr.Operator, right)
 		return -right.(float64)
 	}
 	return nil
+}
+
+// Runtime Error Functions ====================================================
+//
+
+func checkNumberOperand(operator *token.Token, operand interface{}) {
+	switch operand.(type) {
+	case float64:
+		return
+	default:
+		panic(NewError(operator, "Operand must be a number."))
+	}
+}
+
+func checkNumberOperands(
+	operator *token.Token, leftOperand, rightOperand interface{}) {
+	if _, ok := leftOperand.(float64); ok {
+		if _, ok := rightOperand.(float64); ok {
+			return
+		}
+	}
+
+	panic(NewError(operator, "Operands must both be numbers."))
 }
 
 // Support Functions ==========================================================

@@ -1,6 +1,5 @@
 package repl
 
-
 // Debug ======================================================================
 //
 
@@ -13,6 +12,8 @@ type debug struct {
 	parseErr       bool
 	exprHeader     bool
 	expr           bool
+	evalErrHeader  bool
+	evalErr        bool
 	resultHeader   bool
 	result         bool
 }
@@ -27,6 +28,8 @@ func noDebug() debug {
 		parseErr:       false,
 		exprHeader:     false,
 		expr:           false,
+		evalErrHeader:  false,
+		evalErr:        false,
 		resultHeader:   false,
 		result:         true,
 	}
@@ -42,6 +45,8 @@ func defaultDebug() debug {
 		parseErr:       true,
 		exprHeader:     false,
 		expr:           false,
+		evalErrHeader:  true,
+		evalErr:        true,
 		resultHeader:   false,
 		result:         true,
 	}
@@ -57,6 +62,8 @@ func fullDebug() debug {
 		parseErr:       true,
 		exprHeader:     true,
 		expr:           true,
+		evalErrHeader:  true,
+		evalErr:        true,
 		resultHeader:   true,
 		result:         true,
 	}

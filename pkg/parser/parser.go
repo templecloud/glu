@@ -114,6 +114,7 @@ func (p *Parser) primary() ast.Expr {
 }
 
 // Parser Cursor Functions ====================================================
+//
 
 func (p *Parser) consume(tt token.Type, message string) *token.Token {
 	if p.check(tt) {

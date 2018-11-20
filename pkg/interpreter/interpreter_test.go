@@ -78,3 +78,31 @@ func TestEvaluate_Expression(t *testing.T) {
 		}
 	}
 }
+
+func TestEvaluate_ExpressionFailure(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"1 + \"wibble\"", "Operands must both be numbers."},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := parser.New(tokens)
+		expr := p.Parse()
+		i := Interpreter{}
+		result := i.Evaluate(expr)
+		if result != nil {
+			t.Fatalf("test[%d] - Expected nil result. Expected=%v, Actual=%v",
+				idx, result, nil)
+		}
+		if len(i.Errors) != 1 {
+			t.Fatalf("test[%d] - Unexpected number of errors. Expected=%q, Actual=%q",
+				idx, len(i.Errors), 1)
+		}
+		if tt.expected != i.Errors[0].message {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, i.Errors[0].message)
+		}
+	}
+}

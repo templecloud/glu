@@ -111,11 +111,22 @@ func (r *Repl) Exec(input string) {
 		// Evaluate
 		i := interpreter.Interpreter{}
 		result := i.Evaluate(expr)
-		if r.config.resultHeader {
-			fmt.Printf("result : ")
-		}
-		if r.config.result {
-			fmt.Printf("%v\n", result)
+		if len(i.Errors) > 0 {
+			for idx, evalErr := range i.Errors {
+				if r.config.evalErrHeader {
+					fmt.Printf("i_err[%d] :", idx)
+				}
+				if r.config.evalErr {
+					fmt.Printf("%v\n", evalErr)
+				}
+			}
+		} else {
+			if r.config.resultHeader {
+				fmt.Printf("result : ")
+			}
+			if r.config.result {
+				fmt.Printf("%v\n", result)
+			}
 		}
 	}
 }
