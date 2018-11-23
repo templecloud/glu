@@ -131,7 +131,7 @@ func (p *Parser) statement() ast.Stmt {
 func (p *Parser) printStatement() ast.Stmt {
 	value := p.expression()
 	p.consume(token.Semicolon, "Expect ';' after value.")
-	return ast.NewPrintStmt(value)
+	return ast.NewLogStmt(value)
 }
 
 func (p *Parser) expressionStatement() ast.Stmt {

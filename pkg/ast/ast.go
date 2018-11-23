@@ -16,7 +16,7 @@ type Visitor interface {
 	VisitLiteralExpr(l *Literal) interface{}
 	VisitUnaryExpr(u *Unary) interface{}
 	// statements
-	VisitPrintStmt(ps *PrintStmt) interface{}
+	VisitLogStmt(ps *LogStmt) interface{}
 	VisitExprStmt(es *ExprStmt) interface{}
 }
 

@@ -26,20 +26,20 @@ func (es *ExprStmt) Accept(visitor Visitor) interface{} {
 	return visitor.VisitExprStmt(es)
 }
 
-// PrintStmt ==================================================================
+// LogStmt ==================================================================
 //
 
-// PrintStmt statement node.
-type PrintStmt struct {
+// LogStmt statement node.
+type LogStmt struct {
 	Expr
 }
 
-// NewPrintStmt constructor.
-func NewPrintStmt(expr Expr) *PrintStmt {
-	return &PrintStmt{Expr: expr}
+// NewLogStmt constructor.
+func NewLogStmt(expr Expr) *LogStmt {
+	return &LogStmt{Expr: expr}
 }
 
 // Accept a Vistor that can perform an operation on the node to return a result.
-func (ps *PrintStmt) Accept(visitor Visitor) interface{} {
-	return visitor.VisitPrintStmt(ps)
+func (ps *LogStmt) Accept(visitor Visitor) interface{} {
+	return visitor.VisitLogStmt(ps)
 }

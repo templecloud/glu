@@ -49,8 +49,8 @@ func (p *Printer) VisitUnaryExpr(expr *Unary) interface{} {
 // Stmt Functions =============================================================
 //
 
-// VisitPrintStmt returns a string representation of the node.
-func (p *Printer) VisitPrintStmt(stmt *PrintStmt) interface{} {
+// VisitLogStmt returns a string representation of the node.
+func (p *Printer) VisitLogStmt(stmt *LogStmt) interface{} {
 	return p.parenthesize("#ps", stmt.Expr)
 }
 

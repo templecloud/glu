@@ -141,8 +141,8 @@ func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
 	// return nil
 }
 
-// VisitPrintStmt evaluates the node.
-func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) interface{} {
+// VisitLogStmt evaluates the node.
+func (i *Interpreter) VisitLogStmt(stmt *ast.LogStmt) interface{} {
 	value := i.Evaluate(stmt.Expr)
 	fmt.Printf("%v\n", value)
 	return nil
