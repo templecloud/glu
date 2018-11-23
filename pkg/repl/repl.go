@@ -17,8 +17,8 @@ const (
 	// Version is the current semantic version.
 	version  = "0.0.1"
 	exit     = "exit"
-	debugOn  = "debug.on"
-	debugOff = "debug.off"
+	debugOn  = "debug on"
+	debugOff = "debug off"
 )
 
 // Repl ===================================================================
@@ -88,21 +88,19 @@ func (r *Repl) Exec(input string) {
 	// Parser
 	p := parser.New(tokens)
 	stmts := p.Parse()
-
-	for _, stmt := range stmts {
-		if len(p.Errors) > 0 {
-			for idx, parserErr := range p.Errors {
-				if r.config.parseErrHeader {
-					fmt.Printf("p_err[%d]: ", idx)
-				}
-				if r.config.parseErr {
-					fmt.Printf("%+v\n", parserErr)
-				}
+	if len(p.Errors) > 0 {
+		for idx, parserErr := range p.Errors {
+			if r.config.parseErrHeader {
+				fmt.Printf("p_err[%d]: ", idx)
 			}
-		} else {
+			if r.config.parseErr {
+				fmt.Printf("%+v\n", parserErr)
+			}
+		}
+	} else {
+		for _, stmt := range stmts {
 			printer := ast.Printer{}
 			exprStr := printer.Print(stmt)
-
 			if r.config.exprHeader {
 				fmt.Printf("expr   :")
 			}
@@ -126,10 +124,11 @@ func (r *Repl) Exec(input string) {
 				if r.config.resultHeader {
 					fmt.Printf("result : ")
 				}
-				if r.config.result {
+				if r.config.result && result != nil {
 					fmt.Printf("%v\n", result)
 				}
 			}
 		}
 	}
+
 }

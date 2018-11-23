@@ -39,8 +39,8 @@ func defaultDebug() debug {
 	return debug{
 		tokenHeader:    false,
 		token:          false,
-		tokenErrHeader: false,
-		tokenErr:       false,
+		tokenErrHeader: true,
+		tokenErr:       true,
 		parseErrHeader: true,
 		parseErr:       true,
 		exprHeader:     false,
