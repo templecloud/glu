@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/templecloud/glu/pkg/ast"
@@ -16,14 +17,14 @@ type Interpreter struct {
 	Errors []*Error
 }
 
-// Evaluate recursively traverses the specified Expr and returns a string
+// Evaluate recursively traverses the specified Stmt and returns a string
 // representation.
-func (i *Interpreter) Evaluate(expr ast.Expr) interface{} {
+func (i *Interpreter) Evaluate(stmt ast.Stmt) interface{} {
 	defer func() {
 		if r := recover(); r != nil {
 			switch err := r.(type) {
 			case *Error:
-				// If evaluation error is detected panic try and recover
+				// If evaluation error is detected panic try and recover.
 				i.Errors = append(i.Errors, err)
 			default:
 				// Else, continue generic runtime error.
@@ -31,7 +32,7 @@ func (i *Interpreter) Evaluate(expr ast.Expr) interface{} {
 			}
 		}
 	}()
-	return expr.Accept(i)
+	return stmt.Accept(i)
 }
 
 // VisitBinaryExpr evaluates the node.
@@ -108,7 +109,7 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.Unary) interface{} {
 	return nil
 }
 
-// Runtime Error Functions ====================================================
+// Expr Runtime Error Functions ===============================================
 //
 
 func checkNumberOperand(operator *token.Token, operand interface{}) {
@@ -129,6 +130,22 @@ func checkNumberOperands(
 	}
 
 	panic(NewError(operator, "Operands must both be numbers."))
+}
+
+// Stmt Runtime Error Functions ===============================================
+//
+
+// VisitExprStmt evaluates the node.
+func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
+	return i.Evaluate(stmt.Expr)
+	// return nil
+}
+
+// VisitPrintStmt evaluates the node.
+func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) interface{} {
+	value := i.Evaluate(stmt.Expr)
+	fmt.Printf("%v\n", value)
+	return nil
 }
 
 // Support Functions ==========================================================

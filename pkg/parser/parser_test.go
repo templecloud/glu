@@ -12,15 +12,15 @@ func TestParse_Expression(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"123", "123"},
-		{"-123", "(- 123)"},
-		{"123 + 123", "(+ 123 123)"},
-		{"123 - 123", "(- 123 123)"},
-		{"123 * 123", "(* 123 123)"},
-		{"123 / 123", "(/ 123 123)"},
-		{"-123 * 123", "(* (- 123) 123)"},
-		{"(-123 * 123)", "(#g (* (- 123) 123))"},
-		{"(-123 * 123) / (123 - 123)", "(/ (#g (* (- 123) 123)) (#g (- 123 123)))"},
+		{"123;", "(#es 123)"},
+		{"-123;", "(#es (- 123))"},
+		{"123 + 123;", "(#es (+ 123 123))"},
+		{"123 - 123;", "(#es (- 123 123))"},
+		{"123 * 123;", "(#es (* 123 123))"},
+		{"123 / 123;", "(#es (/ 123 123))"},
+		{"-123 * 123;", "(#es (* (- 123) 123))"},
+		{"(-123 * 123);", "(#es (#g (* (- 123) 123)))"},
+		{"(-123 * 123) / (123 - 123);", "(#es (/ (#g (* (- 123) 123)) (#g (- 123 123))))"},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)
@@ -28,7 +28,7 @@ func TestParse_Expression(t *testing.T) {
 		p := New(tokens)
 		expr := p.Parse()
 		printer := ast.Printer{}
-		actual := printer.Print(expr)
+		actual := printer.Print(expr[0])
 		if tt.expected != actual {
 			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
 		}
@@ -56,4 +56,3 @@ func TestParse_ExpressionFailure(t *testing.T) {
 		}
 	}
 }
-

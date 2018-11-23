@@ -18,8 +18,8 @@ func New(tokens []*token.Token) *Parser {
 }
 
 // Parse an expression from the Parser tokens.
-func (p *Parser) Parse() ast.Expr {
-	var expr ast.Expr
+func (p *Parser) Parse() []ast.Stmt {
+	var stmts []ast.Stmt
 	for !p.isAtEnd() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -34,10 +34,15 @@ func (p *Parser) Parse() ast.Expr {
 				}
 			}
 		}()
-		expr = p.expression()
+		stmt := p.statement()
+		stmts = append(stmts, stmt)
 	}
-	return expr
+
+	return stmts
 }
+
+// Expression Functions =======================================================
+//
 
 func (p *Parser) expression() ast.Expr {
 	return p.equality()
@@ -111,6 +116,28 @@ func (p *Parser) primary() ast.Expr {
 		return ast.NewGrouping(expr)
 	}
 	panic(NewError(p.tokens[p.current], "Token failed to match any rule."))
+}
+
+// Statement Functions ========================================================
+//
+
+func (p *Parser) statement() ast.Stmt {
+	if p.match(token.Log) {
+		return p.printStatement()
+	}
+	return p.expressionStatement()
+}
+
+func (p *Parser) printStatement() ast.Stmt {
+	value := p.expression()
+	p.consume(token.Semicolon, "Expect ';' after value.")
+	return ast.NewPrintStmt(value)
+}
+
+func (p *Parser) expressionStatement() ast.Stmt {
+	expr := p.expression()
+	p.consume(token.Semicolon, "Expect ';' after expression.")
+	return ast.NewExprStmt(expr)
 }
 
 // Parser Cursor Functions ====================================================

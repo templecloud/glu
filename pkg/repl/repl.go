@@ -87,45 +87,48 @@ func (r *Repl) Exec(input string) {
 
 	// Parser
 	p := parser.New(tokens)
-	expr := p.Parse()
-	if len(p.Errors) > 0 {
-		for idx, parserErr := range p.Errors {
-			if r.config.parseErrHeader {
-				fmt.Printf("p_err[%d]: ", idx)
-			}
-			if r.config.parseErr {
-				fmt.Printf("%+v\n", parserErr)
-			}
-		}
-	} else {
-		printer := ast.Printer{}
-		exprStr := printer.Print(expr)
+	stmts := p.Parse()
 
-		if r.config.exprHeader {
-			fmt.Printf("expr   :")
-		}
-		if r.config.expr {
-			fmt.Printf("%s\n", exprStr)
-		}
-
-		// Evaluate
-		i := interpreter.Interpreter{}
-		result := i.Evaluate(expr)
-		if len(i.Errors) > 0 {
-			for idx, evalErr := range i.Errors {
-				if r.config.evalErrHeader {
-					fmt.Printf("i_err[%d] :", idx)
+	for _, stmt := range stmts {
+		if len(p.Errors) > 0 {
+			for idx, parserErr := range p.Errors {
+				if r.config.parseErrHeader {
+					fmt.Printf("p_err[%d]: ", idx)
 				}
-				if r.config.evalErr {
-					fmt.Printf("%v\n", evalErr)
+				if r.config.parseErr {
+					fmt.Printf("%+v\n", parserErr)
 				}
 			}
 		} else {
-			if r.config.resultHeader {
-				fmt.Printf("result : ")
+			printer := ast.Printer{}
+			exprStr := printer.Print(stmt)
+
+			if r.config.exprHeader {
+				fmt.Printf("expr   :")
 			}
-			if r.config.result {
-				fmt.Printf("%v\n", result)
+			if r.config.expr {
+				fmt.Printf("%s\n", exprStr)
+			}
+
+			// Evaluate
+			i := interpreter.Interpreter{}
+			result := i.Evaluate(stmt)
+			if len(i.Errors) > 0 {
+				for idx, evalErr := range i.Errors {
+					if r.config.evalErrHeader {
+						fmt.Printf("i_err[%d] :", idx)
+					}
+					if r.config.evalErr {
+						fmt.Printf("%v\n", evalErr)
+					}
+				}
+			} else {
+				if r.config.resultHeader {
+					fmt.Printf("result : ")
+				}
+				if r.config.result {
+					fmt.Printf("%v\n", result)
+				}
 			}
 		}
 	}

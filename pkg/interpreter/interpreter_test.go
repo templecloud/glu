@@ -15,41 +15,41 @@ func TestEvaluate_Expression(t *testing.T) {
 		expectedValue interface{}
 		expectedType  string
 	}{
-		{"123", float64(123), "float64"},
-		{"-123", float64(-123), "float64"},
-		{"-123.5", float64(-123.5), "float64"},
-		{"123.5", float64(123.5), "float64"},
+		{"123;", float64(123), "float64"},
+		{"-123;", float64(-123), "float64"},
+		{"-123.5;", float64(-123.5), "float64"},
+		{"123.5;", float64(123.5), "float64"},
 		// TODO
 		// {"123.45", float64(123.45)},
-		{"1 + 1", float64(2), "float64"},
-		{"1 + 1 + 1", float64(3), "float64"},
-		{"2.5 + 2.5", float64(5), "float64"},
-		{"2.5 + 3.5 + 4.0", float64(10), "float64"},
+		{"1 + 1;", float64(2), "float64"},
+		{"1 + 1 + 1;", float64(3), "float64"},
+		{"2.5 + 2.5;", float64(5), "float64"},
+		{"2.5 + 3.5 + 4.0;", float64(10), "float64"},
 
-		{"1 - 1", float64(0), "float64"},
-		{"1 - 2", float64(-1), "float64"},
+		{"1 - 1;", float64(0), "float64"},
+		{"1 - 2;", float64(-1), "float64"},
 
-		{"2 * 0", float64(0), "float64"},
-		{"2 * 1", float64(2), "float64"},
-		{"2 * 2", float64(4), "float64"},
-		{"2 * -2", float64(-4), "float64"},
+		{"2 * 0;", float64(0), "float64"},
+		{"2 * 1;", float64(2), "float64"},
+		{"2 * 2;", float64(4), "float64"},
+		{"2 * -2;", float64(-4), "float64"},
 
-		{"2 / 2", float64(1), "float64"},
-		{"2 / 1", float64(2), "float64"},
-		{"2 / (1 / 2)", float64(4), "float64"},
+		{"2 / 2;", float64(1), "float64"},
+		{"2 / 1;", float64(2), "float64"},
+		{"2 / (1 / 2);", float64(4), "float64"},
 		// TODO: +Inf
 		// {"2 / 0", float64(4), "float64"},
 
-		{" 1 == 1", true, "bool"},
-		{" 1 == 2", false, "bool"},
-		{" 1 != 1", false, "bool"},
-		{" 1 != 2", true, "bool"},
-		{" 2 > 1", true, "bool"},
-		{" 1 > 1", false, "bool"},
-		{" 1 >= 1", true, "bool"},
-		{" 1 < 2", true, "bool"},
-		{" 1 < 1", false, "bool"},
-		{" 1 < 2", true, "bool"},
+		{" 1 == 1;", true, "bool"},
+		{" 1 == 2;", false, "bool"},
+		{" 1 != 1;", false, "bool"},
+		{" 1 != 2;", true, "bool"},
+		{" 2 > 1;", true, "bool"},
+		{" 1 > 1;", false, "bool"},
+		{" 1 >= 1;", true, "bool"},
+		{" 1 < 2;", true, "bool"},
+		{" 1 < 1;", false, "bool"},
+		{" 1 < 2;", true, "bool"},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)
@@ -58,7 +58,7 @@ func TestEvaluate_Expression(t *testing.T) {
 		expr := p.Parse()
 		i := Interpreter{}
 
-		actual := i.Evaluate(expr)
+		actual := i.Evaluate(expr[0])
 		var actualValue interface{}
 		actualType := reflect.TypeOf(actual)
 		switch actual.(type) {
@@ -84,7 +84,7 @@ func TestEvaluate_ExpressionFailure(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"1 + \"wibble\"", "Operands must both be numbers."},
+		{"1 + \"wibble\";", "Operands must both be numbers."},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)
@@ -92,7 +92,7 @@ func TestEvaluate_ExpressionFailure(t *testing.T) {
 		p := parser.New(tokens)
 		expr := p.Parse()
 		i := Interpreter{}
-		result := i.Evaluate(expr)
+		result := i.Evaluate(expr[0])
 		if result != nil {
 			t.Fatalf("test[%d] - Expected nil result. Expected=%v, Actual=%v",
 				idx, result, nil)

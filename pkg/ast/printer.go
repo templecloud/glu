@@ -13,6 +13,9 @@ import (
 type Printer struct {
 }
 
+// Expr Functions =============================================================
+//
+
 // Print recursively traverses the specified Expr and returns a string
 // representation.
 func (p *Printer) Print(expr Expr) string {
@@ -41,6 +44,19 @@ func (p *Printer) VisitLiteralExpr(expr *Literal) interface{} {
 // VisitUnaryExpr returns a string representation of the node.
 func (p *Printer) VisitUnaryExpr(expr *Unary) interface{} {
 	return p.parenthesize(expr.Operator.Lexeme, expr.Right)
+}
+
+// Stmt Functions =============================================================
+//
+
+// VisitPrintStmt returns a string representation of the node.
+func (p *Printer) VisitPrintStmt(stmt *PrintStmt) interface{} {
+	return p.parenthesize("#ps", stmt.Expr)
+}
+
+// VisitExprStmt returns a string representation of the node.
+func (p *Printer) VisitExprStmt(stmt *ExprStmt) interface{} {
+	return p.parenthesize("#es", stmt.Expr)
 }
 
 // Support Functions ==========================================================
