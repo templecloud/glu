@@ -41,6 +41,28 @@ func (p *Parser) Parse() []ast.Stmt {
 	return stmts
 }
 
+// Statement Functions ========================================================
+//
+
+func (p *Parser) statement() ast.Stmt {
+	if p.match(token.Log) {
+		return p.printStatement()
+	}
+	return p.expressionStatement()
+}
+
+func (p *Parser) printStatement() ast.Stmt {
+	value := p.expression()
+	p.consume(token.Semicolon, "Expect ';' after value.")
+	return ast.NewLogStmt(value)
+}
+
+func (p *Parser) expressionStatement() ast.Stmt {
+	expr := p.expression()
+	p.consume(token.Semicolon, "Expect ';' after expression.")
+	return ast.NewExprStmt(expr)
+}
+
 // Expression Functions =======================================================
 //
 
@@ -118,27 +140,7 @@ func (p *Parser) primary() ast.Expr {
 	panic(NewError(p.tokens[p.current], "Token failed to match any rule."))
 }
 
-// Statement Functions ========================================================
-//
 
-func (p *Parser) statement() ast.Stmt {
-	if p.match(token.Log) {
-		return p.printStatement()
-	}
-	return p.expressionStatement()
-}
-
-func (p *Parser) printStatement() ast.Stmt {
-	value := p.expression()
-	p.consume(token.Semicolon, "Expect ';' after value.")
-	return ast.NewLogStmt(value)
-}
-
-func (p *Parser) expressionStatement() ast.Stmt {
-	expr := p.expression()
-	p.consume(token.Semicolon, "Expect ';' after expression.")
-	return ast.NewExprStmt(expr)
-}
 
 // Parser Cursor Functions ====================================================
 //
