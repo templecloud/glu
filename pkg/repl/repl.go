@@ -14,10 +14,13 @@ import (
 const (
 	// Prompt is the REPL prompt.
 	Prompt = "glu> "
-	// Version is the current semantic version.
-	version  = "0.0.1"
-	exit     = "exit"
-	debugOn  = "debug on"
+	// version is the current semantic version.
+	version = "0.0.1"
+	// exit is a repl command to exist the repl.
+	exit = "exit"
+	// debugOn is a repl command to turn on full debugging.
+	debugOn = "debug on"
+	// debugOff is a repl command to turn off debugging.
 	debugOff = "debug off"
 )
 
@@ -128,9 +131,10 @@ func (r *Repl) Exec(input string) {
 				}
 				if r.config.result && result != nil {
 					fmt.Printf("%v\n", result)
+				} else {
+					fmt.Println()
 				}
 			}
 		}
 	}
-
 }

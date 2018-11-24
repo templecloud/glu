@@ -107,7 +107,7 @@ func (p *Parser) primary() ast.Expr {
 	if p.match(token.Nil) {
 		return ast.NewLiteral(nil)
 	}
-	if p.match(token.Number, token.String) {
+	if p.match(token.Number, token.String) {		
 		return ast.NewLiteral(p.previous().Lexeme)
 	}
 	if p.match(token.LeftParen) {

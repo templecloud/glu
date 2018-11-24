@@ -143,8 +143,22 @@ func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
 // VisitLogStmt evaluates the node.
 func (i *Interpreter) VisitLogStmt(stmt *ast.LogStmt) interface{} {
 	value := i.Evaluate(stmt.Expr)
-	fmt.Printf("%v\n", value)
+	fmt.Printf("%s", stringify(value))
 	return nil
+}
+
+func stringify(value interface{}) string {
+	if value == nil {
+		return "nil"
+	}
+	switch value.(type) {
+	case float64:
+		return fmt.Sprintf("%v", value.(float64))
+	case string:
+		return value.(string)
+	default:
+		return fmt.Sprintf("%v", value)
+	}
 }
 
 // Support Functions ==========================================================

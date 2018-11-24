@@ -51,7 +51,6 @@ const (
 	Comma      = "Comma"      // ","
 	Dot        = "Dot"        // "."
 	Semicolon  = "Semicolon"  // ";"
-	l
 )
 
 // Arithmetic operators.

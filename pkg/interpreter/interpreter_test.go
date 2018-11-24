@@ -142,7 +142,8 @@ func TestEvaluateStdOut_LogStatement(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"log 1 + 1;", "2\n"},
+		{"log 1 + 1;", "2"},
+		{"log \"Hello\";", "Hello"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
