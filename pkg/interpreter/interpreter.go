@@ -138,7 +138,6 @@ func checkNumberOperands(
 // VisitExprStmt evaluates the node.
 func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
 	return i.Evaluate(stmt.Expr)
-	// return nil
 }
 
 // VisitLogStmt evaluates the node.

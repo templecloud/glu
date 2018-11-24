@@ -2,6 +2,9 @@ package interpreter
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -9,7 +12,7 @@ import (
 	"github.com/templecloud/glu/pkg/parser"
 )
 
-func TestEvaluate_Expression(t *testing.T) {
+func TestEvaluate_ExpressionStatemnt(t *testing.T) {
 	tests := []struct {
 		input         string
 		expectedValue interface{}
@@ -79,12 +82,13 @@ func TestEvaluate_Expression(t *testing.T) {
 	}
 }
 
-func TestEvaluate_ExpressionFailure(t *testing.T) {
+func TestEvaluate_ExpressionStatementFailure(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected string
 	}{
-		{"1 + \"wibble\";", "Operands must both be numbers."},
+		{"- \"test\";", "Operand must be a number."},
+		{"1 + \"test\";", "Operands must both be numbers."},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)
@@ -103,6 +107,60 @@ func TestEvaluate_ExpressionFailure(t *testing.T) {
 		}
 		if tt.expected != i.Errors[0].message {
 			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, i.Errors[0].message)
+		}
+	}
+}
+
+func TestEvaluate_LogStatement(t *testing.T) {
+	tests := []struct {
+		input string
+	}{
+		{"log 123;"},
+		{"log 1 + 1;"},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := parser.New(tokens)
+		stmts := p.Parse()
+		i := Interpreter{}
+		actual := i.Evaluate(stmts[0])
+
+		if actual != nil {
+			t.Fatalf(
+				"test[%d] Expected nil return from log statement - Input=%s, ExpectedValue=nil, ActualValue=%v",
+				idx, tt.input, actual)
+		}
+	}
+}
+
+func TestEvaluate_LogStatementFailure(t *testing.T) {
+}
+
+func TestEvaluateStdOut_LogStatement(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"log 1 + 1;", "2\n"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
 		}
 	}
 }

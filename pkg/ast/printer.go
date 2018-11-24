@@ -51,7 +51,7 @@ func (p *Printer) VisitUnaryExpr(expr *Unary) interface{} {
 
 // VisitLogStmt returns a string representation of the node.
 func (p *Printer) VisitLogStmt(stmt *LogStmt) interface{} {
-	return p.parenthesize("#ps", stmt.Expr)
+	return p.parenthesize("#ls", stmt.Expr)
 }
 
 // VisitExprStmt returns a string representation of the node.

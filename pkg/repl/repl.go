@@ -85,7 +85,7 @@ func (r *Repl) Exec(input string) {
 		}
 	}
 
-	// Parser
+	// Parse
 	p := parser.New(tokens)
 	stmts := p.Parse()
 	if len(p.Errors) > 0 {
@@ -99,6 +99,7 @@ func (r *Repl) Exec(input string) {
 		}
 	} else {
 		for _, stmt := range stmts {
+			// Print
 			printer := ast.Printer{}
 			exprStr := printer.Print(stmt)
 			if r.config.exprHeader {
@@ -121,6 +122,7 @@ func (r *Repl) Exec(input string) {
 					}
 				}
 			} else {
+				// Result
 				if r.config.resultHeader {
 					fmt.Printf("result : ")
 				}
