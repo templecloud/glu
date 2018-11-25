@@ -15,14 +15,14 @@ import (
 type Printer struct {
 }
 
+// Print recursively traverses the specified Stmt/Expr and returns a string
+// representation.
+func (p *Printer) Print(stmt Stmt) string {
+	return stmt.Accept(p).(string)
+}
+
 // Expr Functions =============================================================
 //
-
-// Print recursively traverses the specified Expr and returns a string
-// representation.
-func (p *Printer) Print(expr Expr) string {
-	return expr.Accept(p).(string)
-}
 
 // VisitBinaryExpr returns a string representation of the node.
 func (p *Printer) VisitBinaryExpr(expr *Binary) interface{} {
