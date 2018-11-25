@@ -101,6 +101,8 @@ func TestParse_VarStatement(t *testing.T) {
 		expected string
 	}{
 		{"let x = 1 + 1;", "(#vs x = (+ 1 1))"},
+		{"let x = 12345;", "(#vs x = 12345)"},
+		{"let x = \"12345\";", "(#vs x = \"12345\")"},
 		{"let x = \"test\";", "(#vs x = \"test\")"},
 	}
 	for idx, tt := range tests {
