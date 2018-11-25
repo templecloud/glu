@@ -34,15 +34,22 @@ func (p *Parser) Parse() []ast.Stmt {
 				}
 			}
 		}()
-		stmt := p.statement()
+		stmt := p.declaration()
 		stmts = append(stmts, stmt)
 	}
-
 	return stmts
 }
 
 // Statement Functions ========================================================
 //
+
+func (p *Parser) declaration() ast.Stmt {
+	// trjl: synchronise here instead?
+	if p.match(token.Let) {
+		return p.varDeclaration()
+	}
+	return p.statement()
+}
 
 func (p *Parser) statement() ast.Stmt {
 	if p.match(token.Log) {
@@ -61,6 +68,16 @@ func (p *Parser) expressionStatement() ast.Stmt {
 	expr := p.expression()
 	p.consume(token.Semicolon, "Expect ';' after expression.")
 	return ast.NewExprStmt(expr)
+}
+
+func (p *Parser) varDeclaration() ast.Stmt {
+	name := p.consume(token.Identifier, "Expected variable name.")
+	var initialiser ast.Expr
+	if p.match(token.Equal) {
+		initialiser = p.expression()
+	}
+	p.consume(token.Semicolon, "Expected ';' after variable declaration.")
+	return ast.NewVariableStmt(name, initialiser)
 }
 
 // Expression Functions =======================================================
@@ -129,8 +146,11 @@ func (p *Parser) primary() ast.Expr {
 	if p.match(token.Nil) {
 		return ast.NewLiteral(nil)
 	}
-	if p.match(token.Number, token.String) {		
+	if p.match(token.Number, token.String) {
 		return ast.NewLiteral(p.previous().Lexeme)
+	}
+	if p.match(token.Identifier) {
+		return ast.NewVarExpr(p.previous())
 	}
 	if p.match(token.LeftParen) {
 		expr := p.expression()
@@ -139,8 +159,6 @@ func (p *Parser) primary() ast.Expr {
 	}
 	panic(NewError(p.tokens[p.current], "Token failed to match any rule."))
 }
-
-
 
 // Parser Cursor Functions ====================================================
 //

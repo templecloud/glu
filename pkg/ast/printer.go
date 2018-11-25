@@ -46,6 +46,11 @@ func (p *Printer) VisitUnaryExpr(expr *Unary) interface{} {
 	return p.parenthesize(expr.Operator.Lexeme, expr.Right)
 }
 
+// VisitVarExpr returns a string representation of the node.
+func (p *Printer) VisitVarExpr(expr *VarExpr) interface{} {
+	return fmt.Sprintf("%s", expr.Name.Lexeme)
+}
+
 // Stmt Functions =============================================================
 //
 
@@ -57,6 +62,13 @@ func (p *Printer) VisitLogStmt(stmt *LogStmt) interface{} {
 // VisitExprStmt returns a string representation of the node.
 func (p *Printer) VisitExprStmt(stmt *ExprStmt) interface{} {
 	return p.parenthesize("#es", stmt.Expr)
+}
+
+// VisitVariableStmt returns a string representation of the node.
+func (p *Printer) VisitVariableStmt(stmt *VariableStmt) interface{} {
+	// trjl TODO
+	return "VisitVariableStmt"
+	// return p.parenthesize("#vs "+stmt.Name.Lexeme, stmt.Initialiser)
 }
 
 // Support Functions ==========================================================

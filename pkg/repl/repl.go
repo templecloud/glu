@@ -30,11 +30,15 @@ const (
 // Repl is a 'Read Evaluate Print loop' for Glu statements.
 type Repl struct {
 	config
+	evaluator *interpreter.Interpreter
 }
 
 // New creates a new default Repl.
 func New() *Repl {
-	return &Repl{config: defaultConfig()}
+	return &Repl{
+		config:    defaultConfig(),
+		evaluator: interpreter.New(),
+	}
 }
 
 // Start begins a new REPL session.
@@ -113,7 +117,7 @@ func (r *Repl) Exec(input string) {
 			}
 
 			// Evaluate
-			i := interpreter.Interpreter{}
+			i := r.evaluator
 			result := i.Evaluate(stmt)
 			if len(i.Errors) > 0 {
 				for idx, evalErr := range i.Errors {

@@ -14,7 +14,16 @@ import (
 // Interpreter is an implementation of a Visitor that evaluates the statements
 // and expressions it parses.
 type Interpreter struct {
+	*Environment
 	Errors []*Error
+}
+
+// New creates a Interpeter.
+func New() *Interpreter {
+	return &Interpreter{
+		Environment: NewEnvironment(),
+		Errors:      make([]*Error, 0, 5),
+	}
 }
 
 // Evaluate recursively traverses the specified Stmt and returns a string
@@ -109,6 +118,11 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.Unary) interface{} {
 	return nil
 }
 
+// VisitVarExpr evaluates the node.
+func (i *Interpreter) VisitVarExpr(ve *ast.VarExpr) interface{} {
+	return i.Environment.Get(ve.Name)
+}
+
 // Expr Runtime Error Functions ===============================================
 //
 
@@ -147,19 +161,18 @@ func (i *Interpreter) VisitLogStmt(stmt *ast.LogStmt) interface{} {
 	return nil
 }
 
-func stringify(value interface{}) string {
-	if value == nil {
-		return "nil"
+// VisitVariableStmt evaluates the node. See also VisitVarExpr.
+func (i *Interpreter) VisitVariableStmt(stmt *ast.VariableStmt) interface{} {
+	var value interface{}
+	if stmt.Initialiser != nil {
+		value = i.Evaluate(stmt.Initialiser)
 	}
-	switch value.(type) {
-	case float64:
-		return fmt.Sprintf("%v", value.(float64))
-	case string:
-		return value.(string)
-	default:
-		return fmt.Sprintf("%v", value)
-	}
+	i.Environment.Define(stmt.Name.Lexeme, value)
+	return nil
 }
+
+// Interpreter Functions ======================================================
+//
 
 // Support Functions ==========================================================
 //
@@ -186,4 +199,18 @@ func isEqual(t1 interface{}, t2 interface{}) bool {
 		return false
 	}
 	return t1 == t2
+}
+
+func stringify(value interface{}) string {
+	if value == nil {
+		return "nil"
+	}
+	switch value.(type) {
+	case float64:
+		return fmt.Sprintf("%v", value.(float64))
+	case string:
+		return value.(string)
+	default:
+		return fmt.Sprintf("%v", value)
+	}
 }

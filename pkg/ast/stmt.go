@@ -1,5 +1,7 @@
 package ast
 
+import "github.com/templecloud/glu/pkg/token"
+
 // Stmt =======================================================================
 //
 
@@ -26,7 +28,7 @@ func (es *ExprStmt) Accept(visitor Visitor) interface{} {
 	return visitor.VisitExprStmt(es)
 }
 
-// LogStmt ==================================================================
+// LogStmt ====================================================================
 //
 
 // LogStmt statement node.
@@ -42,4 +44,23 @@ func NewLogStmt(expr Expr) *LogStmt {
 // Accept a Vistor that can perform an operation on the node to return a result.
 func (ps *LogStmt) Accept(visitor Visitor) interface{} {
 	return visitor.VisitLogStmt(ps)
+}
+
+// VariableStmt ====================================================================
+//
+
+// VariableStmt statement node.
+type VariableStmt struct {
+	Name        *token.Token
+	Initialiser Expr
+}
+
+// NewVariableStmt constructor.
+func NewVariableStmt(name *token.Token, initialiser Expr) *VariableStmt {
+	return &VariableStmt{Name: name, Initialiser: initialiser}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (vs *VariableStmt) Accept(visitor Visitor) interface{} {
+	return visitor.VisitVariableStmt(vs)
 }

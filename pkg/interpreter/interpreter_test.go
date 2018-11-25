@@ -59,7 +59,7 @@ func TestEvaluate_ExpressionStatemnt(t *testing.T) {
 		tokens, _ := l.ScanTokens()
 		p := parser.New(tokens)
 		expr := p.Parse()
-		i := Interpreter{}
+		i := New()
 
 		actual := i.Evaluate(expr[0])
 		var actualValue interface{}
@@ -95,7 +95,7 @@ func TestEvaluate_ExpressionStatementFailure(t *testing.T) {
 		tokens, _ := l.ScanTokens()
 		p := parser.New(tokens)
 		expr := p.Parse()
-		i := Interpreter{}
+		i := New()
 		result := i.Evaluate(expr[0])
 		if result != nil {
 			t.Fatalf("test[%d] - Expected nil result. Expected=%v, Actual=%v",
@@ -123,7 +123,7 @@ func TestEvaluate_LogStatement(t *testing.T) {
 		tokens, _ := l.ScanTokens()
 		p := parser.New(tokens)
 		stmts := p.Parse()
-		i := Interpreter{}
+		i := New()
 		actual := i.Evaluate(stmts[0])
 
 		if actual != nil {
@@ -144,6 +144,34 @@ func TestEvaluateStdOut_LogStatement(t *testing.T) {
 	}{
 		{"log 1 + 1;", "2\n"},
 		{"log \"Hello\";", "Hello\n"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestEvaluateStdOut_VarStatement(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"let x = 1 + 1; log x;", "\n2\n"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {

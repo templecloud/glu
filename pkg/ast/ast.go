@@ -15,9 +15,11 @@ type Visitor interface {
 	VisitGroupingExpr(g *Grouping) interface{}
 	VisitLiteralExpr(l *Literal) interface{}
 	VisitUnaryExpr(u *Unary) interface{}
+	VisitVarExpr(ve *VarExpr) interface{}
 	// statements
 	VisitLogStmt(ps *LogStmt) interface{}
 	VisitExprStmt(es *ExprStmt) interface{}
+	VisitVariableStmt(vs *VariableStmt) interface{}
 }
 
 // Expr =======================================================================
@@ -101,4 +103,22 @@ func NewUnary(operator *token.Token, right Expr) *Unary {
 // Accept a Vistor that can perform an operation on the node to return a result.
 func (u *Unary) Accept(visitor Visitor) interface{} {
 	return visitor.VisitUnaryExpr(u)
+}
+
+// VarExpr ======================================================================
+//
+
+// VarExpr expression node.
+type VarExpr struct {
+	Name *token.Token
+}
+
+// NewVarExpr constructor.
+func NewVarExpr(name *token.Token) *VarExpr {
+	return &VarExpr{Name: name}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (ve *VarExpr) Accept(visitor Visitor) interface{} {
+	return visitor.VisitVarExpr(ve)
 }
