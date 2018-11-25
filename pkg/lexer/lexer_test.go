@@ -186,9 +186,9 @@ func TestScanTokens_Keyword_Logical(t *testing.T) {
 }
 
 func TestScanTokens_Keyword_Declaration(t *testing.T) {
-	input := "let func"
+	input := "var func"
 	expected := []expectedToken{
-		{token.Let, "let", 0, 0, 3},
+		{token.Var, "var", 0, 0, 3},
 		{token.Func, "func", 0, 4, 4},
 		{token.EOF, "", 0, 8, 0},
 	}
@@ -221,14 +221,14 @@ func TestScanTokens_Keyword_Identifier(t *testing.T) {
 }
 
 func TestScanTokens_SimpleFunction(t *testing.T) {
-	input := "func somefunc() { let x = 5; return x; }"
+	input := "func somefunc() { var x = 5; return x; }"
 	expected := []expectedToken{
 		{token.Func, "func", 0, 0, 4},
 		{token.Identifier, "somefunc", 0, 5, 8},
 		{token.LeftParen, "(", 0, 13, 1},
 		{token.RightParen, ")", 0, 14, 1},
 		{token.LeftBrace, "{", 0, 16, 1},
-		{token.Let, "let", 0, 18, 3},
+		{token.Var, "var", 0, 18, 3},
 		{token.Identifier, "x", 0, 22, 1},
 		{token.Equal, "=", 0, 24, 1},
 		{token.Number, "5", 0, 26, 1},

@@ -169,7 +169,7 @@ func TestEvaluateStdOut_VarStatement(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"let x = 1 + 1; log x;", "\n2\n"},
+		{"var x = 1 + 1; log x;", "\n2\n"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {

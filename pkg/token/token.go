@@ -92,7 +92,7 @@ const (
 	While  = "while"
 	For    = "for"
 	Return = "return"
-	Let    = "let"
+	Var    = "var"
 	Func   = "func"
 	Log    = "log"
 )

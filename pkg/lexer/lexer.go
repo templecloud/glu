@@ -244,8 +244,8 @@ func (l *Lexer) identifier() *token.Token {
 	case "return":
 		tt = token.Return
 	// Declaration
-	case "let":
-		tt = token.Let
+	case "var":
+		tt = token.Var
 	case "func":
 		tt = token.Func
 	// Utility

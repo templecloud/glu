@@ -45,7 +45,7 @@ func (p *Parser) Parse() []ast.Stmt {
 
 func (p *Parser) declaration() ast.Stmt {
 	// trjl: synchronise here instead?
-	if p.match(token.Let) {
+	if p.match(token.Var) {
 		return p.varDeclaration()
 	}
 	return p.statement()
@@ -219,7 +219,7 @@ func (p *Parser) synchronize() {
 		}
 		switch p.peek().Type {
 		case token.Func:
-		case token.Let:
+		case token.Var:
 		case token.For:
 		case token.If:
 		case token.While:

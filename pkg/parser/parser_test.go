@@ -100,11 +100,11 @@ func TestParse_VarStatement(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"let x = 1 + 1;", "(#vs x = (+ 1 1))"},
-		{"let x = 12345;", "(#vs x = 12345)"},
-		{"let x = \"12345\";", "(#vs x = \"12345\")"},
-		{"let x = \"test\";", "(#vs x = \"test\")"},
-		{"let x = test;", "(#vs x = test)"},
+		{"var x = 1 + 1;", "(#vs x = (+ 1 1))"},
+		{"var x = 12345;", "(#vs x = 12345)"},
+		{"var x = \"12345\";", "(#vs x = \"12345\")"},
+		{"var x = \"test\";", "(#vs x = \"test\")"},
+		{"var x = test;", "(#vs x = test)"},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)
