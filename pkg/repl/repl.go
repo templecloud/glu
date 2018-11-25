@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/templecloud/glu/pkg/ast"
 	"github.com/templecloud/glu/pkg/interpreter"
@@ -133,8 +134,10 @@ func (r *Repl) Exec(input string) {
 				}
 				if r.config.result && result != nil {
 					fmt.Printf("%v\n", result)
-				} else {
-					fmt.Println()
+				} else if strings.HasPrefix(exprStr, "(#ls") {
+					// NB: Small hack to recognise REPL 'log' 
+					//     statements.
+					fmt.Println();
 				}
 			}
 		}

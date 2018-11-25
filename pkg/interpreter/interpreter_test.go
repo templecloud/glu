@@ -169,7 +169,9 @@ func TestEvaluateStdOut_VarStatement(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"var x = 1 + 1; log x;", "\n2\n"},
+		{"var x; log x;", "nil\n"},
+		{"var x = 1 + 1; log x;", "2\n"},
+		{"log x;", "runtime error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n\n"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {

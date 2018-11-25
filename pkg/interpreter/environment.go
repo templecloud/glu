@@ -27,9 +27,10 @@ func (env *Environment) Define(name string, value interface{}) {
 
 // Get attempts to retrieve the specified environment variable.
 func (env *Environment) Get(name *token.Token) interface{} {
-	if env.Values[name.Lexeme] != nil {
-		return env.Values[name.Lexeme]
+	if lexeme, ok := env.Values[name.Lexeme]; ok {
+		return lexeme
+	} else {
+		err := fmt.Sprintf("Undefined variable '%s'.", name.Lexeme)
+		panic(NewError(name, err))
 	}
-	err := fmt.Sprintf("Undefined variable '%s'.", name.Lexeme)
-	panic(NewError(name, err))
 }
