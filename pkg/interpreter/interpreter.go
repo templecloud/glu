@@ -15,39 +15,47 @@ import (
 // and expressions it parses.
 type Interpreter struct {
 	*Environment
-	Errors []*Error
 }
 
 // New creates a Interpeter.
 func New() *Interpreter {
 	return &Interpreter{
 		Environment: NewEnvironment(),
-		Errors:      make([]*Error, 0, 5),
 	}
 }
 
-// Evaluate recursively traverses the specified Stmt and returns a string
-// representation.
-func (i *Interpreter) Evaluate(stmt ast.Stmt) interface{} {
+// Eval recursively traverses the specified Stmt and returns the result or the
+// first runtime error it encountered.
+func (i *Interpreter) Eval(stmt ast.Stmt) (result interface{}, err *Error) {
 	defer func() {
 		if r := recover(); r != nil {
-			switch err := r.(type) {
+			switch e := r.(type) {
 			case *Error:
 				// If evaluation error is detected panic try and recover.
-				i.Errors = append(i.Errors, err)
+				err = e
 			default:
 				// Else, continue generic runtime error.
-				panic(err)
+				panic(e)
 			}
 		}
 	}()
+	result = i.evaluate(stmt)
+	return
+}
+
+// evaluate ===================================================================
+//
+
+// evaluate recursively traverses the specified Stmt and returns a string
+// representation.
+func (i *Interpreter) evaluate(stmt ast.Stmt) interface{} {
 	return stmt.Accept(i)
 }
 
 // VisitBinaryExpr evaluates the node.
 func (i *Interpreter) VisitBinaryExpr(expr *ast.Binary) interface{} {
-	left := i.Evaluate(expr.Left)
-	right := i.Evaluate(expr.Right)
+	left := i.evaluate(expr.Left)
+	right := i.evaluate(expr.Right)
 
 	switch expr.Operator.Type {
 	// Compators
@@ -89,7 +97,7 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.Binary) interface{} {
 
 // VisitGroupingExpr evaluates the node.
 func (i *Interpreter) VisitGroupingExpr(expr *ast.Grouping) interface{} {
-	return i.Evaluate(expr.Expr)
+	return i.evaluate(expr.Expr)
 }
 
 // VisitLiteralExpr evaluates the node and terminates recursion to return
@@ -107,7 +115,7 @@ func (i *Interpreter) VisitLiteralExpr(expr *ast.Literal) interface{} {
 
 // VisitUnaryExpr evaluates the node.
 func (i *Interpreter) VisitUnaryExpr(expr *ast.Unary) interface{} {
-	right := i.Evaluate(expr.Right)
+	right := i.evaluate(expr.Right)
 	switch expr.Operator.Type {
 	case token.Not:
 		return !isTruthy(right)
@@ -151,12 +159,12 @@ func checkNumberOperands(
 
 // VisitExprStmt evaluates the node.
 func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
-	return i.Evaluate(stmt.Expr)
+	return i.evaluate(stmt.Expr)
 }
 
 // VisitLogStmt evaluates the node.
 func (i *Interpreter) VisitLogStmt(stmt *ast.LogStmt) interface{} {
-	value := i.Evaluate(stmt.Expr)
+	value := i.evaluate(stmt.Expr)
 	fmt.Printf("%s", stringify(value))
 	return nil
 }
@@ -165,7 +173,7 @@ func (i *Interpreter) VisitLogStmt(stmt *ast.LogStmt) interface{} {
 func (i *Interpreter) VisitVariableStmt(stmt *ast.VariableStmt) interface{} {
 	var value interface{}
 	if stmt.Initialiser != nil {
-		value = i.Evaluate(stmt.Initialiser)
+		value = i.evaluate(stmt.Initialiser)
 	}
 	i.Environment.Define(stmt.Name.Lexeme, value)
 	return nil

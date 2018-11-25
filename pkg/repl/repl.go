@@ -118,15 +118,13 @@ func (r *Repl) Exec(input string) {
 
 			// Evaluate
 			i := r.evaluator
-			result := i.Evaluate(stmt)
-			if len(i.Errors) > 0 {
-				for idx, evalErr := range i.Errors {
-					if r.config.evalErrHeader {
-						fmt.Printf("i_err[%d] :", idx)
-					}
-					if r.config.evalErr {
-						fmt.Printf("%v\n", evalErr)
-					}
+			result, evalErr := i.Eval(stmt)
+			if evalErr != nil {
+				if r.config.evalErrHeader {
+					fmt.Printf("runtime error: ")
+				}
+				if r.config.evalErr {
+					fmt.Printf("%v\n", evalErr)
 				}
 			} else {
 				// Result

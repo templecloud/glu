@@ -12,7 +12,7 @@ import (
 	"github.com/templecloud/glu/pkg/parser"
 )
 
-func TestEvaluate_ExpressionStatemnt(t *testing.T) {
+func TestEvaluate_ExpressionStatement(t *testing.T) {
 	tests := []struct {
 		input         string
 		expectedValue interface{}
@@ -61,7 +61,7 @@ func TestEvaluate_ExpressionStatemnt(t *testing.T) {
 		expr := p.Parse()
 		i := New()
 
-		actual := i.Evaluate(expr[0])
+		actual, _ := i.Eval(expr[0])
 		var actualValue interface{}
 		actualType := reflect.TypeOf(actual)
 		switch actual.(type) {
@@ -94,19 +94,18 @@ func TestEvaluate_ExpressionStatementFailure(t *testing.T) {
 		l := lexer.New(tt.input)
 		tokens, _ := l.ScanTokens()
 		p := parser.New(tokens)
-		expr := p.Parse()
-		i := New()
-		result := i.Evaluate(expr[0])
+		stmts := p.Parse()
+		result, evalErr := New().Eval(stmts[0])
 		if result != nil {
 			t.Fatalf("test[%d] - Expected nil result. Expected=%v, Actual=%v",
 				idx, result, nil)
 		}
-		if len(i.Errors) != 1 {
-			t.Fatalf("test[%d] - Unexpected number of errors. Expected=%q, Actual=%q",
-				idx, len(i.Errors), 1)
+		if evalErr == nil {
+			t.Fatalf("test[%d] - Expected error result. Expected=%s, Actual=%s",
+				idx, tt.expected, "nil")
 		}
-		if tt.expected != i.Errors[0].message {
-			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, i.Errors[0].message)
+		if tt.expected != evalErr.message {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, evalErr)
 		}
 	}
 }
@@ -123,8 +122,7 @@ func TestEvaluate_LogStatement(t *testing.T) {
 		tokens, _ := l.ScanTokens()
 		p := parser.New(tokens)
 		stmts := p.Parse()
-		i := New()
-		actual := i.Evaluate(stmts[0])
+		actual, _ := New().Eval(stmts[0])
 
 		if actual != nil {
 			t.Fatalf(
