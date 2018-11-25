@@ -3,6 +3,8 @@ package ast
 import (
 	"fmt"
 	"strings"
+
+	"github.com/templecloud/glu/pkg/token"
 )
 
 // Printer ====================================================================
@@ -37,6 +39,9 @@ func (p *Printer) VisitGroupingExpr(expr *Grouping) interface{} {
 func (p *Printer) VisitLiteralExpr(expr *Literal) interface{} {
 	if expr.Value == nil {
 		return "nil"
+	}
+	if expr.TokenType == token.String {
+		return fmt.Sprintf("\"%s\"", expr.Value.(string))
 	}
 	return fmt.Sprintf("%+v", expr.Value)
 }

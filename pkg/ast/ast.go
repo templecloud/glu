@@ -73,12 +73,13 @@ func (g *Grouping) Accept(visitor Visitor) interface{} {
 
 // Literal expression node.
 type Literal struct {
-	Value interface{}
+	TokenType token.Type
+	Value     interface{}
 }
 
 // NewLiteral constructor.
-func NewLiteral(value interface{}) *Literal {
-	return &Literal{Value: value}
+func NewLiteral(tokenType token.Type, value interface{}) *Literal {
+	return &Literal{TokenType: tokenType, Value: value}
 }
 
 // Accept a Vistor that can perform an operation on the node to return a result.

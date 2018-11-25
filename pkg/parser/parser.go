@@ -138,16 +138,16 @@ func (p *Parser) unary() ast.Expr {
 
 func (p *Parser) primary() ast.Expr {
 	if p.match(token.False) {
-		return ast.NewLiteral(false)
+		return ast.NewLiteral(p.previous().Type, false)
 	}
 	if p.match(token.True) {
-		return ast.NewLiteral(true)
+		return ast.NewLiteral(p.previous().Type, true)
 	}
 	if p.match(token.Nil) {
-		return ast.NewLiteral(nil)
+		return ast.NewLiteral(p.previous().Type, nil)
 	}
 	if p.match(token.Number, token.String) {
-		return ast.NewLiteral(p.previous().Lexeme)
+		return ast.NewLiteral(p.previous().Type, p.previous().Lexeme)
 	}
 	if p.match(token.Identifier) {
 		return ast.NewVarExpr(p.previous())
