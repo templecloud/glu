@@ -104,6 +104,7 @@ func TestParse_VarStatement(t *testing.T) {
 		{"let x = 12345;", "(#vs x = 12345)"},
 		{"let x = \"12345\";", "(#vs x = \"12345\")"},
 		{"let x = \"test\";", "(#vs x = \"test\")"},
+		{"let x = test;", "(#vs x = test)"},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)
