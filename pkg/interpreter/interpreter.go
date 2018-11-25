@@ -171,9 +171,6 @@ func (i *Interpreter) VisitVariableStmt(stmt *ast.VariableStmt) interface{} {
 	return nil
 }
 
-// Interpreter Functions ======================================================
-//
-
 // Support Functions ==========================================================
 //
 

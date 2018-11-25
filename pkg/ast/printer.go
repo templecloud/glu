@@ -66,9 +66,8 @@ func (p *Printer) VisitExprStmt(stmt *ExprStmt) interface{} {
 
 // VisitVariableStmt returns a string representation of the node.
 func (p *Printer) VisitVariableStmt(stmt *VariableStmt) interface{} {
-	// trjl TODO
-	return "VisitVariableStmt"
-	// return p.parenthesize("#vs "+stmt.Name.Lexeme, stmt.Initialiser)
+	nfo := fmt.Sprintf("#vs %s =", stmt.Name.Lexeme)
+	return p.parenthesize(nfo, stmt.Initialiser)
 }
 
 // Support Functions ==========================================================

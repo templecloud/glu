@@ -76,7 +76,6 @@ func TestParse_LogStatement(t *testing.T) {
 	}
 }
 
-
 func TestParse_LogStatementFailure(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -92,6 +91,30 @@ func TestParse_LogStatementFailure(t *testing.T) {
 		actualErrorMessage := p.Errors[0].message
 		if tt.expected != actualErrorMessage {
 			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actualErrorMessage)
+		}
+	}
+}
+
+func TestParse_VarStatement(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"let x = 1 + 1;", "(#vs x = (+ 1 1))"},
+		{"let x = \"test\";", "(#vs x = test)"},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		expr := p.Parse()
+		if len(expr) < 1 {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%v", idx, tt.expected, nil)
+		}
+		printer := ast.Printer{}
+		actual := printer.Print(expr[0])
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
 		}
 	}
 }

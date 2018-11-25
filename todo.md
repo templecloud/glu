@@ -19,9 +19,10 @@ Things to do next.
 ---
 
 #### Interpreter
-* Add 'error' checking mechanism.
+* Allow a runtime error to be returned as a result.
 * Handle 'division by 0'. 
 * Add 'numeral' node type.
+
 
 ---
 
