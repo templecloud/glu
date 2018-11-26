@@ -2,20 +2,12 @@ package lexer
 
 import (
 	"fmt"
-	"regexp"
-	"unicode"
 
 	"github.com/templecloud/glu/pkg/token"
 )
 
 // Lexer ======================================================================
 //
-
-// Error represents a lexical error in a source file or stream.
-type Error struct {
-	Message string
-	token.Source
-}
 
 // Lexer takes an input strings and attempts to decompose it into tokens.
 type Lexer struct {
@@ -46,7 +38,7 @@ func NewWithConfig(input string, config Config) *Lexer {
 		start:  0, current: 0, column: 0}
 }
 
-// Lexical Functions ==========================================================
+// Lexical Methods ============================================================
 //
 
 // ScanTokens tokenises the input returns a list of Tokens and Errors.
@@ -258,64 +250,7 @@ func (l *Lexer) identifier() *token.Token {
 	return l.createToken(tt, string(identifier))
 }
 
-// Lexical Cursor Functions ===================================================
-//
-
-// Return true if the input has been fully consumed; false otherwise.
-func (l *Lexer) isAtEnd() bool {
-	return l.current >= len(l.input)
-}
-
-// Advance the current cursor forward one character and return
-// the original underlying character.
-func (l *Lexer) advance() rune {
-	l.current++
-	l.column++
-	return l.input[l.current-1]
-}
-
-// Check if the current character matches the expected character
-// and if true consume it by incrementing the cursor.
-//
-// If the current cursor character matched the expected character
-// then advance the current cursor one step and return true; else
-// false.
-func (l *Lexer) matches(expected rune) bool {
-	if l.isAtEnd() {
-		return false
-	}
-	if l.input[l.current] != expected {
-		return false
-	}
-	l.current++
-	l.column++
-	return true
-}
-
-// Peek at the current character without advancing the cursor.
-//
-// If the cursor reaches the end of the input return the nil character;
-// else return the current character.
-func (l *Lexer) peek() rune {
-	if l.isAtEnd() {
-		return nilByte
-	}
-	// TODO: Make safe for index
-	return l.input[l.current]
-}
-
-// Peek at the next character without advancing the cursor.
-//
-// If the cursor reaches the end of the input return the nil character;
-// else return the next character.
-func (l *Lexer) peekNext() rune {
-	if l.current+1 >= len(l.input) {
-		return nilByte
-	}
-	return l.input[l.current+1]
-}
-
-// Constructor Functions =======================================================
+// Constructor Methods =========================================================
 //
 
 func (l *Lexer) createToken(tokenType token.Type, lexeme string) *token.Token {
@@ -329,24 +264,3 @@ func (l *Lexer) createError(message string) *Error {
 		token.Source{Origin: l.origin, Line: l.line, Column: l.column}}
 }
 
-// Support Functions ===========================================================
-//
-
-var nilByte = '\000'
-var alpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
-var digit = regexp.MustCompile(`^[0-9]+$`).MatchString
-
-// Return true if the input is '_' or alphabetic; false otherwise.
-func isAlpha(c rune) bool {
-	return c == '_' || unicode.IsLetter(c)
-}
-
-// Return true if the input is numeric; false otherwise.
-func isDigit(c rune) bool {
-	return unicode.IsDigit(c)
-}
-
-// Return true if the input is alphanumeric; false otherwise.
-func isAlphaNumeric(c rune) bool {
-	return isDigit(c) || isAlpha(c)
-}
