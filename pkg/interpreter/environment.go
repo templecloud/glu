@@ -20,6 +20,16 @@ func NewEnvironment() *Environment {
 	return &Environment{Values: values}
 }
 
+// Assign assigns a new value to an existing variable in the environment.
+func (env *Environment) Assign(name *token.Token, value interface{}) {
+	if _, ok := env.Values[name.Lexeme]; ok {
+		env.Values[name.Lexeme] = value
+	} else {
+		err := fmt.Sprintf("Undefined variable '%s'.", name.Lexeme)
+		panic(NewError(name, err))
+	}
+}
+
 // Define adds a new variable to the environment.
 func (env *Environment) Define(name string, value interface{}) {
 	env.Values[name] = value

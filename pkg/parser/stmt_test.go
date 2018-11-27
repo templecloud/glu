@@ -7,7 +7,7 @@ import (
 	"github.com/templecloud/glu/pkg/lexer"
 )
 
-func TestParse_LogStatement(t *testing.T) {
+func TestParse_LogStmt(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected string
@@ -27,7 +27,7 @@ func TestParse_LogStatement(t *testing.T) {
 	}
 }
 
-func TestParse_LogStatementFailure(t *testing.T) {
+func TestParseError_LogStmt(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected string
@@ -46,7 +46,7 @@ func TestParse_LogStatementFailure(t *testing.T) {
 	}
 }
 
-func TestParse_VarStatement(t *testing.T) {
+func TestParse_VariableStmt(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected string
@@ -56,6 +56,7 @@ func TestParse_VarStatement(t *testing.T) {
 		{"var x = \"12345\";", "(#vs x = \"12345\")"},
 		{"var x = \"test\";", "(#vs x = \"test\")"},
 		{"var x = test;", "(#vs x = test)"},
+		{"var x;", "(#vs x)"},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)

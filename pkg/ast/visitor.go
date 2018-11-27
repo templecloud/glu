@@ -7,6 +7,7 @@ package ast
 // parameterized, but, we will need to wait for golang generic types for that!
 type Visitor interface {
 	// expressions
+	VisitAssignExpr(a *Assign) interface{}
 	VisitBinaryExpr(b *Binary) interface{}
 	VisitGroupingExpr(g *Grouping) interface{}
 	VisitLiteralExpr(l *Literal) interface{}
@@ -17,5 +18,3 @@ type Visitor interface {
 	VisitExprStmt(es *ExprStmt) interface{}
 	VisitVariableStmt(vs *VariableStmt) interface{}
 }
-
-

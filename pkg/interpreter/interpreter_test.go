@@ -2,9 +2,6 @@ package interpreter
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -12,7 +9,7 @@ import (
 	"github.com/templecloud/glu/pkg/parser"
 )
 
-func TestEvaluate_ExpressionStatement(t *testing.T) {
+func TestEvaluate_ExprStmt(t *testing.T) {
 	tests := []struct {
 		input         string
 		expectedValue interface{}
@@ -82,7 +79,7 @@ func TestEvaluate_ExpressionStatement(t *testing.T) {
 	}
 }
 
-func TestEvaluate_ExpressionStatementFailure(t *testing.T) {
+func TestEvaluateError_ExprStmt(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected string
@@ -98,7 +95,7 @@ func TestEvaluate_ExpressionStatementFailure(t *testing.T) {
 		result, evalErr := New().Eval(stmts[0])
 		if result != nil {
 			t.Fatalf("test[%d] - Expected nil result. Expected=%v, Actual=%v",
-				idx, result, nil)
+				idx, nil, result)
 		}
 		if evalErr == nil {
 			t.Fatalf("test[%d] - Expected error result. Expected=%s, Actual=%s",
@@ -110,7 +107,7 @@ func TestEvaluate_ExpressionStatementFailure(t *testing.T) {
 	}
 }
 
-func TestEvaluate_LogStatement(t *testing.T) {
+func TestEvaluate_LogStmt(t *testing.T) {
 	tests := []struct {
 		input string
 	}{
@@ -132,64 +129,29 @@ func TestEvaluate_LogStatement(t *testing.T) {
 	}
 }
 
-func TestEvaluate_LogStatementFailure(t *testing.T) {
-}
-
-func TestEvaluateStdOut_LogStatement(t *testing.T) {
+func TestEvaluateError_LogStmt(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected string
 	}{
-		{"log 1 + 1;", "2\n"},
-		{"log \"Hello\";", "Hello\n"},
+		{"log bob;", "Undefined variable 'bob'."},
 	}
-	pwd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to initialise test: %v", err)
-	}
-	pwd = filepath.Dir(filepath.Dir(pwd))
-
 	for idx, tt := range tests {
-		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
-		out, err := exec.Command(cmd, tt.input).Output()
-		if err != nil {
-			t.Fatalf(
-				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
-				idx, tt.input, tt.expected, err)
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := parser.New(tokens)
+		stmts := p.Parse()
+		result, evalErr := New().Eval(stmts[0])
+		if result != nil {
+			t.Fatalf("test[%d] - Expected nil result. Expected=%v, Actual=%v",
+				idx, result, nil)
 		}
-		actual := string(out)
-		if tt.expected != actual {
-			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		if evalErr == nil {
+			t.Fatalf("test[%d] - Expected error result. Expected=%s, Actual=%s",
+				idx, tt.expected, "nil")
 		}
-	}
-}
-
-func TestEvaluateStdOut_VarStatement(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"var x; log x;", "nil\n"},
-		{"var x = 1 + 1; log x;", "2\n"},
-		{"log x;", "runtime error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n\n"},
-	}
-	pwd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to initialise test: %v", err)
-	}
-	pwd = filepath.Dir(filepath.Dir(pwd))
-
-	for idx, tt := range tests {
-		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
-		out, err := exec.Command(cmd, tt.input).Output()
-		if err != nil {
-			t.Fatalf(
-				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
-				idx, tt.input, tt.expected, err)
-		}
-		actual := string(out)
-		if tt.expected != actual {
-			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		if tt.expected != evalErr.message {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, evalErr.message)
 		}
 	}
 }

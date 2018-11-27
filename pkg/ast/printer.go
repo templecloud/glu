@@ -24,6 +24,12 @@ func (p *Printer) Print(stmt Stmt) string {
 // Expr Functions =============================================================
 //
 
+// VisitAssignExpr returns a string representation of the node.
+func (p *Printer) VisitAssignExpr(expr *Assign) interface{} {
+	nfo := fmt.Sprintf("#as %s =", expr.Name.Lexeme)
+	return p.parenthesize(nfo, expr.Value)
+}
+
 // VisitBinaryExpr returns a string representation of the node.
 func (p *Printer) VisitBinaryExpr(expr *Binary) interface{} {
 	return p.parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right)
@@ -75,8 +81,8 @@ func (p *Printer) VisitVariableStmt(stmt *VariableStmt) interface{} {
 		nfo := fmt.Sprintf("#vs %s =", stmt.Name.Lexeme)
 		return p.parenthesize(nfo, stmt.Initialiser)
 	} else {
-		nfo := fmt.Sprintf("#vs %s ", stmt.Name.Lexeme)
-		return nfo 
+		nfo := fmt.Sprintf("(#vs %s)", stmt.Name.Lexeme)
+		return nfo
 	}
 }
 

@@ -12,6 +12,25 @@ type Expr interface {
 	Accept(visitor Visitor) interface{}
 }
 
+// Assign =====================================================================
+//
+
+// Assign expression node.
+type Assign struct {
+	Name  *token.Token
+	Value Expr
+}
+
+// NewAssign constructor.
+func NewAssign(name *token.Token, value Expr) *Assign {
+	return &Assign{Name: name, Value: value}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (a *Assign) Accept(visitor Visitor) interface{} {
+	return visitor.VisitAssignExpr(a)
+}
+
 // Binary =====================================================================
 //
 

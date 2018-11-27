@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/templecloud/glu/pkg/ast"
 	"github.com/templecloud/glu/pkg/token"
 )
@@ -8,8 +10,26 @@ import (
 // Expression Functions =======================================================
 //
 
+func (p *Parser) assignment() ast.Expr {
+	expr := p.equality()
+	if p.match(token.Equal) {
+		equals := p.previous()
+		value := p.assignment()
+		switch v := expr.(type) {
+		case *ast.VarExpr:
+			name := v.Name
+			return ast.NewAssign(name, value)
+		default:
+			err := NewError(equals, "Invalid assignment target.")
+			fmt.Printf("Parse Error: %+v\n", err)
+		}
+	}
+	return expr
+}
+
+// expression parses the root expression hierarchy.
 func (p *Parser) expression() ast.Expr {
-	return p.equality()
+	return p.assignment()
 }
 
 func (p *Parser) equality() ast.Expr {

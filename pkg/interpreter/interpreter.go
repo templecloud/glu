@@ -52,6 +52,18 @@ func (i *Interpreter) evaluate(stmt ast.Stmt) interface{} {
 	return stmt.Accept(i)
 }
 
+// Expression Functions =======================================================
+//
+
+// VisitAssignExpr evaluates the node.
+// NB: The value is returned so assignments can can be nested inside other
+// expressions.
+func (i *Interpreter) VisitAssignExpr(expr *ast.Assign) interface{} {
+	value := i.evaluate(expr.Value)
+	i.Environment.Assign(expr.Name, value)
+	return value
+}
+
 // VisitBinaryExpr evaluates the node.
 func (i *Interpreter) VisitBinaryExpr(expr *ast.Binary) interface{} {
 	left := i.evaluate(expr.Left)
@@ -150,11 +162,10 @@ func checkNumberOperands(
 			return
 		}
 	}
-
 	panic(NewError(operator, "Operands must both be numbers."))
 }
 
-// Stmt Runtime Error Functions ===============================================
+// Stmt Functions =============================================================
 //
 
 // VisitExprStmt evaluates the node.

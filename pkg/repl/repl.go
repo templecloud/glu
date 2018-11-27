@@ -106,7 +106,7 @@ func (r *Repl) Exec(input string) {
 			}
 		}
 	} else {
-		for _, stmt := range stmts {
+		for idx, stmt := range stmts {
 			// Print
 			printer := ast.Printer{}
 			exprStr := printer.Print(stmt)
@@ -132,12 +132,12 @@ func (r *Repl) Exec(input string) {
 				if r.config.resultHeader {
 					fmt.Printf("result : ")
 				}
-				if r.config.result && result != nil {
+				if r.config.result && result != nil && idx == len(stmts)-1 {
 					fmt.Printf("%v\n", result)
 				} else if strings.HasPrefix(exprStr, "(#ls") {
-					// NB: Small hack to recognise REPL 'log' 
+					// NB: Small hack to recognise REPL 'log'
 					//     statements.
-					fmt.Println();
+					fmt.Println()
 				}
 			}
 		}
