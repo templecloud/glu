@@ -79,8 +79,8 @@ func TestParse_BlockStmt(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"{var a = 1; log a; { a = 2; log 1; } log a;}",
-			"(#bs (#vs a = 1) (#ls a) (#bs (#es (#as a = 2)) (#ls 1)) (#ls a))"},
+		{"{var a = 1; log a; { a = 2; log a; } log a;}",
+			"(#bs (#vs a = 1) (#ls a) (#bs (#es (#as a = 2)) (#ls a)) (#ls a))"},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)
