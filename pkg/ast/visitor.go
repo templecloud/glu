@@ -14,6 +14,7 @@ type Visitor interface {
 	VisitUnaryExpr(u *Unary) interface{}
 	VisitVarExpr(ve *VarExpr) interface{}
 	// statements
+	VisitBlockStmt(bs *BlockStmt) interface{}
 	VisitLogStmt(ps *LogStmt) interface{}
 	VisitExprStmt(es *ExprStmt) interface{}
 	VisitVariableStmt(vs *VariableStmt) interface{}

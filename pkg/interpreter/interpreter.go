@@ -20,7 +20,7 @@ type Interpreter struct {
 // New creates a Interpeter.
 func New() *Interpreter {
 	return &Interpreter{
-		Environment: NewEnvironment(),
+		Environment: NewGlobalEnvironment(),
 	}
 }
 
@@ -168,6 +168,12 @@ func checkNumberOperands(
 // Stmt Functions =============================================================
 //
 
+// VisitBlockStmt evaluates the node.
+func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) interface{} {
+	i.executeBlock(stmt.Stmts, NewChildEnvironment(i.Environment))
+	return nil
+}
+
 // VisitExprStmt evaluates the node.
 func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
 	return i.evaluate(stmt.Expr)
@@ -189,6 +195,17 @@ func (i *Interpreter) VisitVariableStmt(stmt *ast.VariableStmt) interface{} {
 	i.Environment.Define(stmt.Name.Lexeme, value)
 	return nil
 }
+
+func (i *Interpreter) executeBlock(stmts []ast.Stmt, env *Environment) {
+	previous := i.Environment
+	defer func() {
+		i.Environment = previous
+	}()
+	for _, stmt := range stmts {
+		i.evaluate(stmt)
+	}
+}
+
 
 // Support Functions ==========================================================
 //

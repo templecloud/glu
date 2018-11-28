@@ -10,6 +10,24 @@ type Stmt interface {
 	Accept(visitor Visitor) interface{}
 }
 
+// BlockStmt ==================================================================
+//
+
+// BlockStmt statement node.
+type BlockStmt struct {
+	Stmts []Stmt
+}
+
+// NewBlockStmt constructor.
+func NewBlockStmt(stmts []Stmt) *BlockStmt {
+	return &BlockStmt{Stmts: stmts}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (bs *BlockStmt) Accept(visitor Visitor) interface{} {
+	return visitor.VisitBlockStmt(bs)
+}
+
 // ExprStmt ===================================================================
 //
 

@@ -8,6 +8,15 @@ import (
 // Statement Functions ========================================================
 //
 
+func (p *Parser) blockStatement() []ast.Stmt {
+	var stmts []ast.Stmt
+	for !p.check(token.RightBrace) && !p.isAtEnd() {
+		stmts = append(stmts, p.declaration())
+	}
+	p.consume(token.RightBrace, "Expect '}' after block.")
+	return stmts
+}
+
 func (p *Parser) declaration() ast.Stmt {
 	// trjl: synchronise here instead?
 	if p.match(token.Var) {
@@ -16,11 +25,10 @@ func (p *Parser) declaration() ast.Stmt {
 	return p.statement()
 }
 
-func (p *Parser) statement() ast.Stmt {
-	if p.match(token.Log) {
-		return p.printStatement()
-	}
-	return p.expressionStatement()
+func (p *Parser) expressionStatement() ast.Stmt {
+	expr := p.expression()
+	p.consume(token.Semicolon, "Expect ';' after expression.")
+	return ast.NewExprStmt(expr)
 }
 
 func (p *Parser) printStatement() ast.Stmt {
@@ -29,10 +37,14 @@ func (p *Parser) printStatement() ast.Stmt {
 	return ast.NewLogStmt(value)
 }
 
-func (p *Parser) expressionStatement() ast.Stmt {
-	expr := p.expression()
-	p.consume(token.Semicolon, "Expect ';' after expression.")
-	return ast.NewExprStmt(expr)
+func (p *Parser) statement() ast.Stmt {
+	if p.match(token.Log) {
+		return p.printStatement()
+	}
+	if p.match(token.LeftBrace) {
+		return ast.NewBlockStmt(p.blockStatement())
+	}
+	return p.expressionStatement()
 }
 
 func (p *Parser) varDeclaration() ast.Stmt {

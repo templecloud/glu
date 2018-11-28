@@ -11,19 +11,27 @@ import (
 
 // Environment represents a scopted set of runtime variables.
 type Environment struct {
+	Parent *Environment
 	Values map[string]interface{}
 }
 
-// NewEnvironment creates a new map based environment.
-func NewEnvironment() *Environment {
+// NewGlobalEnvironment creates a new root map based environment.
+func NewGlobalEnvironment() *Environment {
+	return NewChildEnvironment(nil)
+}
+
+// NewChildEnvironment creates a new map based environment.
+func NewChildEnvironment(environment *Environment) *Environment {
 	values := make(map[string]interface{})
-	return &Environment{Values: values}
+	return &Environment{Parent: environment, Values: values}
 }
 
 // Assign assigns a new value to an existing variable in the environment.
 func (env *Environment) Assign(name *token.Token, value interface{}) {
 	if _, ok := env.Values[name.Lexeme]; ok {
 		env.Values[name.Lexeme] = value
+	} else if env.Parent != nil {
+		env.Parent.Assign(name, value)
 	} else {
 		err := fmt.Sprintf("Undefined variable '%s'.", name.Lexeme)
 		panic(NewError(name, err))
@@ -39,8 +47,10 @@ func (env *Environment) Define(name string, value interface{}) {
 func (env *Environment) Get(name *token.Token) interface{} {
 	if lexeme, ok := env.Values[name.Lexeme]; ok {
 		return lexeme
-	} else {
-		err := fmt.Sprintf("Undefined variable '%s'.", name.Lexeme)
-		panic(NewError(name, err))
 	}
+	if env.Parent != nil {
+		return env.Parent.Get(name)
+	}
+	err := fmt.Sprintf("Undefined variable '%s'.", name.Lexeme)
+	panic(NewError(name, err))
 }

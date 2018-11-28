@@ -73,3 +73,27 @@ func TestParse_VariableStmt(t *testing.T) {
 		}
 	}
 }
+
+func TestParse_BlockStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"{var a = 1; log a; { a = 2; log 1; } log a;}",
+			"(#bs (#vs a = 1) (#ls a) (#bs (#es (#as a = 2)) (#ls 1)) (#ls a))"},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		expr := p.Parse()
+		if len(expr) < 1 {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%v", idx, tt.expected, nil)
+		}
+		printer := ast.Printer{}
+		actual := printer.Print(expr[0])
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}

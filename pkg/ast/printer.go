@@ -65,9 +65,17 @@ func (p *Printer) VisitVarExpr(expr *VarExpr) interface{} {
 // Stmt Functions =============================================================
 //
 
-// VisitLogStmt returns a string representation of the node.
-func (p *Printer) VisitLogStmt(stmt *LogStmt) interface{} {
-	return p.parenthesize("#ls", stmt.Expr)
+// VisitBlockStmt returns a string representation of the node.
+func (p *Printer) VisitBlockStmt(bs *BlockStmt) interface{} {
+	var builder strings.Builder
+	builder.WriteString("(")
+	builder.WriteString("#bs")
+	for _, stmt := range bs.Stmts {
+		builder.WriteString(" ")
+		builder.WriteString(stmt.Accept(p).(string))
+	}
+	builder.WriteString(")")
+	return builder.String()
 }
 
 // VisitExprStmt returns a string representation of the node.
@@ -75,15 +83,18 @@ func (p *Printer) VisitExprStmt(stmt *ExprStmt) interface{} {
 	return p.parenthesize("#es", stmt.Expr)
 }
 
+// VisitLogStmt returns a string representation of the node.
+func (p *Printer) VisitLogStmt(stmt *LogStmt) interface{} {
+	return p.parenthesize("#ls", stmt.Expr)
+}
+
 // VisitVariableStmt returns a string representation of the node.
 func (p *Printer) VisitVariableStmt(stmt *VariableStmt) interface{} {
 	if stmt.Initialiser != nil {
 		nfo := fmt.Sprintf("#vs %s =", stmt.Name.Lexeme)
 		return p.parenthesize(nfo, stmt.Initialiser)
-	} else {
-		nfo := fmt.Sprintf("(#vs %s)", stmt.Name.Lexeme)
-		return nfo
 	}
+	return fmt.Sprintf("(#vs %s)", stmt.Name.Lexeme)
 }
 
 // Support Functions ==========================================================
@@ -99,6 +110,5 @@ func (p *Printer) parenthesize(name string, exprs ...Expr) string {
 		builder.WriteString(expr.Accept(p).(string))
 	}
 	builder.WriteString(")")
-
 	return builder.String()
 }
