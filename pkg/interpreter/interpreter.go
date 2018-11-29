@@ -182,6 +182,7 @@ func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
 // VisitLogStmt evaluates the node.
 func (i *Interpreter) VisitLogStmt(stmt *ast.LogStmt) interface{} {
 	value := i.evaluate(stmt.Expr)
+	// fmt.Print("trjl> printing value: ")
 	fmt.Printf("%s", stringify(value))
 	return nil
 }
@@ -196,16 +197,16 @@ func (i *Interpreter) VisitVariableStmt(stmt *ast.VariableStmt) interface{} {
 	return nil
 }
 
-func (i *Interpreter) executeBlock(stmts []ast.Stmt, env *Environment) {
+func (i *Interpreter) executeBlock(stmts []ast.Stmt, newEnvironment *Environment) {
 	previous := i.Environment
 	defer func() {
 		i.Environment = previous
 	}()
 	for _, stmt := range stmts {
+		i.Environment = newEnvironment;
 		i.evaluate(stmt)
 	}
 }
-
 
 // Support Functions ==========================================================
 //
