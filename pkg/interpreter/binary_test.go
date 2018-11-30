@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+	"strings"
 )
 
 func TestBinary_LogStmt(t *testing.T) {
@@ -134,6 +135,35 @@ func TestBinary_BlockExpr(t *testing.T) {
 	}
 }
 
-// TODO: Test Fail
-// '{var a = 5; log a; { var b = 2; log b; var a = 4; log a; } log a; log b;}'
-// {&{Type:Identifier Lexeme:b Source:{Origin: Line:0 Column:70 Length:1}}, Undefined variable 'b'.}
+func TestBinaryError_BlockExpr(t *testing.T) {
+	tests := []struct {
+		input    string
+		expectedResult string
+		expectedError string
+	}{
+		{"{var a = 5; log a; { var b = 2; log b; var a = 4; log a; } log a; log b;}", "524", "Undefined variable 'b'"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expectedResult, err)
+		}
+		actual := string(out)
+		if !strings.Contains(actual, tt.expectedResult) {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expectedResult, actual)
+		}
+		if !strings.Contains(actual, tt.expectedError) {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expectedError, actual)
+		}
+	}
+}
+
