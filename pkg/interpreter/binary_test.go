@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestBinary_LogStmt(t *testing.T) {
@@ -45,7 +45,7 @@ func TestBinary_VarStmt(t *testing.T) {
 	}{
 		{"var x; log x;", "nil\n"},
 		{"var x = 1 + 1; log x;", "2\n"},
-		{"log x;", "runtime error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n\n"},
+		{"log x;", "runtime error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -74,11 +74,12 @@ func TestBinary_AssignExpr(t *testing.T) {
 		expected string
 	}{
 		{"var x;", ""},
-		{"var x; x = 1;", "1\n"},
+		{"var x; x = 1;", ""},
 		{"var x; x = 1; log x;", "1\n"},
 		{"var x = 1; var y = 2; log x + y;", "3\n"},
 		{"var a; a = 1; var b = 3; log a + b;", "4\n"},
-		{"1 + 2; 3 + 4;", "7\n"},
+		{"1 + 2; log 3 + 4;", "7\n"},
+		{"1 + 2; 3 + 4;", ""},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -108,9 +109,7 @@ func TestBinary_BlockExpr(t *testing.T) {
 	}{
 		{"{var a = 5; log a; { var a = 4; log a; } log a;}", "545"},
 		{"{var a = 5; log a; { a = 4; log a; } log a;}", "544"},
-
 		{"{var a = \"a\"; log a; { var a = \"a2\"; log a; } log a;}", "aa2a"},
-
 		{"var a = 5; log a; { var a = 4; log a; } log a;", "5\n45\n"}, // ???
 		{"var a = 5; log a; { a = 4; log a; } log a;", "5\n44\n"},     // ???
 	}
@@ -137,9 +136,9 @@ func TestBinary_BlockExpr(t *testing.T) {
 
 func TestBinaryError_BlockExpr(t *testing.T) {
 	tests := []struct {
-		input    string
+		input          string
 		expectedResult string
-		expectedError string
+		expectedError  string
 	}{
 		{"{var a = 5; log a; { var b = 2; log b; var a = 4; log a; } log a; log b;}", "524", "Undefined variable 'b'"},
 	}
@@ -166,4 +165,3 @@ func TestBinaryError_BlockExpr(t *testing.T) {
 		}
 	}
 }
-

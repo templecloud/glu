@@ -42,6 +42,14 @@ func New() *Repl {
 	}
 }
 
+// NewCmd creates a new command Repl.
+func NewCmd() *Repl {
+	return &Repl{
+		config:    cmdConfig(),
+		evaluator: interpreter.New(),
+	}
+}
+
 // Start begins a new REPL session.
 func (r *Repl) Start(in io.Reader, out io.Writer) {
 	fmt.Printf("Glu %s\n", version)
@@ -125,7 +133,7 @@ func (r *Repl) Exec(input string) {
 					fmt.Printf("runtime error: ")
 				}
 				if r.config.evalErr {
-					fmt.Printf("%v\n", evalErr)
+					fmt.Printf("%v", evalErr)
 				}
 			} else {
 				// Result

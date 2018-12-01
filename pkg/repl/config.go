@@ -28,10 +28,10 @@ func noDebug() debug {
 		parseErr:       false,
 		exprHeader:     false,
 		expr:           false,
-		evalErrHeader:  false,
-		evalErr:        false,
+		evalErrHeader:  true,
+		evalErr:        true,
 		resultHeader:   false,
-		result:         true,
+		result:         false,
 	}
 }
 
@@ -80,4 +80,8 @@ type config struct {
 
 func defaultConfig() config {
 	return config{debug: defaultDebug()}
+}
+
+func cmdConfig() config {
+	return config{debug: noDebug()}
 }

@@ -17,6 +17,6 @@ func main() {
 		repl.New().Start(os.Stdin, os.Stdout)
 	} else {
 		exprStr := strings.Join(os.Args[1:], " ")
-		repl.New().Exec(exprStr)
+		repl.NewCmd().Exec(exprStr)
 	}
 }
