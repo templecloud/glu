@@ -11,7 +11,7 @@ import (
 //
 
 // Printer is an implementation of a Visitor that produces a string
-// representation of the specified Expr..
+// representation of the specified Expr.
 type Printer struct {
 }
 
