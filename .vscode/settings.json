@@ -4,6 +4,7 @@
         "somefunc",
         "stmts",
         "stringify",
-        "tokenz"
+        "tokenz",
+        "wibble"
     ]
 }

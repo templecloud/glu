@@ -179,10 +179,19 @@ func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
 	return i.evaluate(stmt.Expr)
 }
 
+// VisitIfStmt evaluates the node.
+func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) interface{} {
+	if isTruthy(i.evaluate(stmt.Condition)) {
+		i.evaluate(stmt.ThenBranch)
+	} else if stmt.ElseBranch != nil {
+		i.evaluate(stmt.ElseBranch)
+	}
+	return nil
+}
+
 // VisitLogStmt evaluates the node.
 func (i *Interpreter) VisitLogStmt(stmt *ast.LogStmt) interface{} {
 	value := i.evaluate(stmt.Expr)
-	// fmt.Print("trjl> printing value: ")
 	fmt.Printf("%s", stringify(value))
 	return nil
 }

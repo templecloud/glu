@@ -7,6 +7,81 @@ import (
 	"github.com/templecloud/glu/pkg/lexer"
 )
 
+func TestParse_BlockStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"{var a = 1; log a; { a = 2; log a; } log a;}",
+			"(#bs (#vs a = 1) (#ls a) (#bs (#es (#as a = 2)) (#ls a)) (#ls a))"},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		expr := p.Parse()
+		if len(expr) < 1 {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%v", idx, tt.expected, nil)
+		}
+		printer := ast.Printer{}
+		actual := printer.Print(expr[0])
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestParse_IfStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"if (1 + 1 == 2) log \"wibble\";", 
+			"(#is (== (+ 1 1) 2) (#ls \"wibble\"))"},
+		{"if (1 + 1 == 2) log \"wibble\"; else log \"wobble\";", 
+			"(#is (== (+ 1 1) 2) (#ls \"wibble\") (#ls \"wobble\"))"},
+		{"if (1 + 1 == 2) { log \"wibble\"; }",
+			"(#is (== (+ 1 1) 2) (#bs (#ls \"wibble\")))"},
+		{"if (1 + 1 == 5) { log \"wibble\"; }",
+			"(#is (== (+ 1 1) 5) (#bs (#ls \"wibble\")))"},
+		{"if (1 + 1 == 2) { log \"wibble\"; } else { log \"wobble\"; }",
+			"(#is (== (+ 1 1) 2) (#bs (#ls \"wibble\")) (#bs (#ls \"wobble\")))"},
+		{"if (1 + 1 == 5) { log \"wibble\"; } else { log \"wobble\"; }",
+			"(#is (== (+ 1 1) 5) (#bs (#ls \"wibble\")) (#bs (#ls \"wobble\")))"},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		expr := p.Parse()
+		printer := ast.Printer{}
+		actual := printer.Print(expr[0])
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestParseError_IfStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"if 1 + 1 == 2 { log \"wibble\"; }", "Expect '(' after if condition."},
+		{"if (1 + 1 == 2 { log \"wibble\"; }", "Expect ')' after if condition."},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		p.Parse()
+		actualErrorMessage := p.Errors[0].message
+		if tt.expected != actualErrorMessage {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actualErrorMessage)
+		}
+	}
+}
+
 func TestParse_LogStmt(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -57,30 +132,6 @@ func TestParse_VariableStmt(t *testing.T) {
 		{"var x = \"test\";", "(#vs x = \"test\")"},
 		{"var x = test;", "(#vs x = test)"},
 		{"var x;", "(#vs x)"},
-	}
-	for idx, tt := range tests {
-		l := lexer.New(tt.input)
-		tokens, _ := l.ScanTokens()
-		p := New(tokens)
-		expr := p.Parse()
-		if len(expr) < 1 {
-			t.Fatalf("test[%d] - Expected=%q, Actual=%v", idx, tt.expected, nil)
-		}
-		printer := ast.Printer{}
-		actual := printer.Print(expr[0])
-		if tt.expected != actual {
-			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
-		}
-	}
-}
-
-func TestParse_BlockStmt(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"{var a = 1; log a; { a = 2; log a; } log a;}",
-			"(#bs (#vs a = 1) (#ls a) (#bs (#es (#as a = 2)) (#ls a)) (#ls a))"},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)

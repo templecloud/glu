@@ -83,6 +83,23 @@ func (p *Printer) VisitExprStmt(stmt *ExprStmt) interface{} {
 	return p.parenthesize("#es", stmt.Expr)
 }
 
+// VisitIfStmt returns a string representation of the node.
+func (p *Printer) VisitIfStmt(stmt *IfStmt) interface{} {
+	var builder strings.Builder
+	builder.WriteString("(")
+	builder.WriteString("#is")
+	builder.WriteString(" ")
+	builder.WriteString(stmt.Condition.Accept(p).(string))
+	builder.WriteString(" ")
+	builder.WriteString(stmt.ThenBranch.Accept(p).(string))
+	if stmt.ElseBranch != nil {
+		builder.WriteString(" ")
+		builder.WriteString(stmt.ElseBranch.Accept(p).(string))
+	}
+	builder.WriteString(")")
+	return builder.String()
+}
+
 // VisitLogStmt returns a string representation of the node.
 func (p *Printer) VisitLogStmt(stmt *LogStmt) interface{} {
 	return p.parenthesize("#ls", stmt.Expr)
@@ -106,8 +123,10 @@ func (p *Printer) parenthesize(name string, exprs ...Expr) string {
 	builder.WriteString("(")
 	builder.WriteString(name)
 	for _, expr := range exprs {
-		builder.WriteString(" ")
-		builder.WriteString(expr.Accept(p).(string))
+		if expr != nil {
+			builder.WriteString(" ")
+			builder.WriteString(expr.Accept(p).(string))
+		}
 	}
 	builder.WriteString(")")
 	return builder.String()

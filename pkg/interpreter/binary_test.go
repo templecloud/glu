@@ -9,65 +9,6 @@ import (
 	"testing"
 )
 
-func TestBinary_LogStmt(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"log 1 + 1;", "2\n"},
-		{"log \"Hello\";", "Hello\n"},
-	}
-	pwd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to initialise test: %v", err)
-	}
-	pwd = filepath.Dir(filepath.Dir(pwd))
-
-	for idx, tt := range tests {
-		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
-		out, err := exec.Command(cmd, tt.input).Output()
-		if err != nil {
-			t.Fatalf(
-				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
-				idx, tt.input, tt.expected, err)
-		}
-		actual := string(out)
-		if tt.expected != actual {
-			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
-		}
-	}
-}
-
-func TestBinary_VarStmt(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"var x; log x;", "nil\n"},
-		{"var x = 1 + 1; log x;", "2\n"},
-		{"log x;", "runtime error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n"},
-	}
-	pwd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to initialise test: %v", err)
-	}
-	pwd = filepath.Dir(filepath.Dir(pwd))
-
-	for idx, tt := range tests {
-		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
-		out, err := exec.Command(cmd, tt.input).Output()
-		if err != nil {
-			t.Fatalf(
-				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
-				idx, tt.input, tt.expected, err)
-		}
-		actual := string(out)
-		if tt.expected != actual {
-			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
-		}
-	}
-}
-
 func TestBinary_AssignExpr(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -162,6 +103,99 @@ func TestBinaryError_BlockExpr(t *testing.T) {
 		}
 		if !strings.Contains(actual, tt.expectedError) {
 			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expectedError, actual)
+		}
+	}
+}
+
+func TestBinary_IfStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"if (1 + 1 == 2) log \"wibble\";", "wibble"},
+		{"if (1 + 1 == 5) log \"wibble\";", ""},
+		{"if (1 + 1 == 5) log \"wibble\"; else log \"wobble\";", "wobble"},
+		{"if (1 + 1 == 2) { log \"wibble\"; }", "wibble"},
+		{"if (1 + 1 == 5) { log \"wibble\"; }", ""},
+		{"if (1 + 1 == 5) { log \"wibble\"; } else { log \"wobble\"; }", "wobble"},
+		{"if (1 + 1 == 2) { log \"wibble\"; } else { log \"wobble\"; }", "wibble"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestBinary_LogStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"log 1 + 1;", "2\n"},
+		{"log \"Hello\";", "Hello\n"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestBinary_VarStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"var x; log x;", "nil\n"},
+		{"var x = 1 + 1; log x;", "2\n"},
+		{"log x;", "runtime error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
 		}
 	}
 }

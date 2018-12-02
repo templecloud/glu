@@ -46,6 +46,26 @@ func (es *ExprStmt) Accept(visitor Visitor) interface{} {
 	return visitor.VisitExprStmt(es)
 }
 
+// IfStmt ===================================================================
+//
+
+// IfStmt statement node.
+type IfStmt struct {
+	Condition Expr
+	ThenBranch Stmt
+	ElseBranch Stmt
+}
+
+// NewIfStmt constructor.
+func NewIfStmt(condition Expr, thenBranch Stmt, elseBranch Stmt) *IfStmt {
+	return &IfStmt{Condition: condition, ThenBranch: thenBranch, ElseBranch: elseBranch}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (is *IfStmt) Accept(visitor Visitor) interface{} {
+	return visitor.VisitIfStmt(is)
+}
+
 // LogStmt ====================================================================
 //
 

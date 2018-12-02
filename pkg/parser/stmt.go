@@ -31,6 +31,18 @@ func (p *Parser) expressionStatement() ast.Stmt {
 	return ast.NewExprStmt(expr)
 }
 
+func (p *Parser) ifStatement() ast.Stmt {
+	p.consume(token.LeftParen, "Expect '(' after if condition.")
+	condition := p.expression()
+	p.consume(token.RightParen, "Expect ')' after if condition.")
+	thenBranch := p.statement()
+	var elseBranch ast.Stmt
+	if p.match(token.Else) {
+		elseBranch = p.statement()
+	} 
+	return ast.NewIfStmt(condition, thenBranch, elseBranch)
+}
+
 func (p *Parser) printStatement() ast.Stmt {
 	value := p.expression()
 	p.consume(token.Semicolon, "Expect ';' after value.")
@@ -38,6 +50,9 @@ func (p *Parser) printStatement() ast.Stmt {
 }
 
 func (p *Parser) statement() ast.Stmt {
+	if p.match(token.If) {
+		return p.ifStatement()
+	}
 	if p.match(token.Log) {
 		return p.printStatement()
 	}

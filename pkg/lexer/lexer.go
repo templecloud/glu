@@ -263,4 +263,3 @@ func (l *Lexer) createError(message string) *Error {
 		message,
 		token.Source{Origin: l.origin, Line: l.line, Column: l.column}}
 }
-
