@@ -11,6 +11,7 @@ type Visitor interface {
 	VisitBinaryExpr(b *Binary) interface{}
 	VisitGroupingExpr(g *Grouping) interface{}
 	VisitLiteralExpr(l *Literal) interface{}
+	VisitLogicalExpr(l *Logical) interface{}
 	VisitUnaryExpr(u *Unary) interface{}
 	VisitVarExpr(ve *VarExpr) interface{}
 	// statements

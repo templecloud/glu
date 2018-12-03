@@ -118,11 +118,29 @@ func (i *Interpreter) VisitLiteralExpr(expr *ast.Literal) interface{} {
 	if expr.Value == nil {
 		return "nil"
 	}
-	number, err := strconv.ParseFloat(expr.Value.(string), 32)
-	if err != nil {
-		return expr.Value
+	if expr.TokenType == token.Number {
+		number, err := strconv.ParseFloat(expr.Value.(string), 32)
+		if err != nil {
+			return expr.Value
+		}
+		return number
 	}
-	return number
+	return expr.Value
+}
+
+// VisitLogicalExpr evaluates the node.
+func (i *Interpreter) VisitLogicalExpr(expr *ast.Logical) interface{} {
+	left := i.evaluate(expr.Left)
+	if expr.Operator.Type == token.Or {
+		if isTruthy(left) {
+			return left
+		}
+	} else {
+		if !isTruthy(left) {
+			return left
+		}	
+	}
+	return i.evaluate(expr.Right)
 }
 
 // VisitUnaryExpr evaluates the node.

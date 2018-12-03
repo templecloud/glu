@@ -52,6 +52,11 @@ func (p *Printer) VisitLiteralExpr(expr *Literal) interface{} {
 	return fmt.Sprintf("%+v", expr.Value)
 }
 
+// VisitLogicalExpr returns a string representation of the node.
+func (p *Printer) VisitLogicalExpr(expr *Logical) interface{} {
+	return p.parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right)
+}
+
 // VisitUnaryExpr returns a string representation of the node.
 func (p *Printer) VisitUnaryExpr(expr *Unary) interface{} {
 	return p.parenthesize(expr.Operator.Lexeme, expr.Right)

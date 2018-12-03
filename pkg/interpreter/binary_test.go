@@ -112,13 +112,13 @@ func TestBinary_IfStmt(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"if (1 + 1 == 2) log \"wibble\";", "wibble"},
-		{"if (1 + 1 == 5) log \"wibble\";", ""},
-		{"if (1 + 1 == 5) log \"wibble\"; else log \"wobble\";", "wobble"},
-		{"if (1 + 1 == 2) { log \"wibble\"; }", "wibble"},
-		{"if (1 + 1 == 5) { log \"wibble\"; }", ""},
-		{"if (1 + 1 == 5) { log \"wibble\"; } else { log \"wobble\"; }", "wobble"},
-		{"if (1 + 1 == 2) { log \"wibble\"; } else { log \"wobble\"; }", "wibble"},
+		{"if (1 + 1 == 2) log \"test1\";", "test1"},
+		{"if (1 + 1 == 5) log \"test1\";", ""},
+		{"if (1 + 1 == 5) log \"test1\"; else log \"test2\";", "test2"},
+		{"if (1 + 1 == 2) { log \"test1\"; }", "test1"},
+		{"if (1 + 1 == 5) { log \"test1\"; }", ""},
+		{"if (1 + 1 == 5) { log \"test1\"; } else { log \"test2\"; }", "test2"},
+		{"if (1 + 1 == 2) { log \"test1\"; } else { log \"test2\"; }", "test1"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -148,6 +148,46 @@ func TestBinary_LogStmt(t *testing.T) {
 	}{
 		{"log 1 + 1;", "2\n"},
 		{"log \"Hello\";", "Hello\n"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestBinary_LogicalStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"if (true and true) { log true; }", "true"},
+		{"if (true or true) { log true; }", "true"},
+		{"if (true and true or true) { log true; }", "true"},
+
+		{"if (true and false) { log true; }else { log false; }", "false"},
+		{"if (true or false) { log true; } else { log false; }", "true"},
+		{"if (true and false or false) { log true; } else { log false; }", "false"},
+
+		{"if (true and false) { log true; } else { log false; }", "false"},
+		{"if (true or false) { log true; } else { log false; }", "true"},
+		{"if (false and true or true) { log true; } else { log false; }", "true"},
+		{"if (true and false or true) { log true; } else { log false; }", "true"},
+		{"if (true and true or false) { log true; } else { log false; }", "true"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {

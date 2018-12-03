@@ -11,7 +11,7 @@ import (
 //
 
 func (p *Parser) assignment() ast.Expr {
-	expr := p.equality()
+	expr := p.or() 
 	if p.match(token.Equal) {
 		equals := p.previous()
 		value := p.assignment()
@@ -23,6 +23,26 @@ func (p *Parser) assignment() ast.Expr {
 			err := NewError(equals, "Invalid assignment target.")
 			fmt.Printf("Parse Error: %+v\n", err)
 		}
+	}
+	return expr
+}
+
+func (p *Parser) or() ast.Expr {
+	expr := p.and()
+	for p.match(token.Or) {
+		operator := p.previous()
+		right := p.and()
+		expr = ast.NewLogical(expr, operator, right)
+	}
+	return expr
+}
+
+func (p *Parser) and() ast.Expr {
+	expr := p.equality()
+	for p.match(token.And) {
+		operator := p.previous()
+		right := p.equality()
+		expr = ast.NewLogical(expr, operator, right)
 	}
 	return expr
 }

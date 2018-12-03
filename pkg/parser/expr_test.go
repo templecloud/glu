@@ -79,3 +79,34 @@ func TestParse_AssignExpr(t *testing.T) {
 		}
 	}
 }
+
+func TestParse_LogicalExpr(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"true and true;", "(#es (and true true))"},
+		{"{true and true;}", "(#bs (#es (and true true)))"},
+		{"if (true and true) { log true; }", "(#is (and true true) (#bs (#ls true)))"},
+		{"true or true;", "(#es (or true true))"},
+		{"{true or true;}", "(#bs (#es (or true true)))"},
+		{"if (true or true) { log true; }", "(#is (or true true) (#bs (#ls true)))"},
+		{"true and true or true;", "(#es (or (and true true) true))"},
+		{"{true and true or true;}", "(#bs (#es (or (and true true) true)))"},
+		{"if (true and true or true) { log true; }", "(#is (or (and true true) true) (#bs (#ls true)))"},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		expr := p.Parse()
+		if len(expr) < 1 {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%v", idx, tt.expected, nil)
+		}
+		printer := ast.Printer{}
+		actual := printer.Print(expr[0])
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}

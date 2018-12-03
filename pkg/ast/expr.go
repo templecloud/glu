@@ -88,6 +88,26 @@ func (l *Literal) Accept(visitor Visitor) interface{} {
 	return visitor.VisitLiteralExpr(l)
 }
 
+// Logical ====================================================================
+//
+
+// Logical expression node.
+type Logical struct {
+	Left     Expr
+	Operator *token.Token
+	Right    Expr
+}
+
+// NewLogical constructor.
+func NewLogical(left Expr, operator *token.Token, right Expr) *Logical {
+	return &Logical{Left: left, Operator: operator, Right: right}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (l *Logical) Accept(visitor Visitor) interface{} {
+	return visitor.VisitLogicalExpr(l)
+}
+
 // Unary ======================================================================
 //
 

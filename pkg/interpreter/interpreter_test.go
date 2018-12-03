@@ -155,3 +155,35 @@ func TestEvaluateError_LogStmt(t *testing.T) {
 		}
 	}
 }
+
+func TestEvaluate_LogicalExpr(t *testing.T) {
+	tests := []struct {
+		input         string
+		expectedValue bool
+	}{
+		{"true and true;", true},
+		{"true and true and true;", true},
+		{"false and true and true;", false},
+		{"false and true and true;", false},
+		{"true or true;", true},
+		{"true or true or true;", true},
+		{"false or true or true;", true},
+		{"false or true or true;", true},
+		{"true or true and true;", true},
+		{"true or false and true;", true},
+		{"true or false and false;", true},
+		{"false or false and false;", false},
+		{"false or true and false;", false},
+		{"false or true and true;", true},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := parser.New(tokens)
+		expr := p.Parse()
+		actualValue, _ := New().Eval(expr[0])
+		if tt.expectedValue != actualValue {
+			t.Fatalf("test[%d] - Input=%s, ExpectedValue=%v, ActualValue=%v", idx, tt.input, tt.expectedValue, actualValue)
+		}
+	}
+}
