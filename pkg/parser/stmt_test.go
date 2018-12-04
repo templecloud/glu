@@ -36,9 +36,9 @@ func TestParse_IfStmt(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"if (1 + 1 == 2) log \"wibble\";", 
+		{"if (1 + 1 == 2) log \"wibble\";",
 			"(#is (== (+ 1 1) 2) (#ls \"wibble\"))"},
-		{"if (1 + 1 == 2) log \"wibble\"; else log \"wobble\";", 
+		{"if (1 + 1 == 2) log \"wibble\"; else log \"wobble\";",
 			"(#is (== (+ 1 1) 2) (#ls \"wibble\") (#ls \"wobble\"))"},
 		{"if (1 + 1 == 2) { log \"wibble\"; }",
 			"(#is (== (+ 1 1) 2) (#bs (#ls \"wibble\")))"},
@@ -145,6 +145,50 @@ func TestParse_VariableStmt(t *testing.T) {
 		actual := printer.Print(expr[0])
 		if tt.expected != actual {
 			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestParse_WhileStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"{var x = 0; while (x > 0) { log \"*\"; x = x - 1; }}",
+			"(#bs (#vs x = 0) (#ws (> x 0) (#bs (#ls \"*\") (#es (#as x = (- x 1))))))"},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		expr := p.Parse()
+		if len(expr) < 1 {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%v", idx, tt.expected, nil)
+		}
+		printer := ast.Printer{}
+		actual := printer.Print(expr[0])
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestParseError_WhileStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"{while x > 0) { log \"*\"; }}", "Expected '(' after while."},
+		{"{while (x > 0 { log \"*\"; }}", "Expected ')' after while."},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		p.Parse()
+		actualErrorMessage := p.Errors[0].message
+		if tt.expected != actualErrorMessage {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actualErrorMessage)
 		}
 	}
 }

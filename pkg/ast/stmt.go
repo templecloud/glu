@@ -51,7 +51,7 @@ func (es *ExprStmt) Accept(visitor Visitor) interface{} {
 
 // IfStmt statement node.
 type IfStmt struct {
-	Condition Expr
+	Condition  Expr
 	ThenBranch Stmt
 	ElseBranch Stmt
 }
@@ -101,4 +101,23 @@ func NewVariableStmt(name *token.Token, initialiser Expr) *VariableStmt {
 // Accept a Vistor that can perform an operation on the node to return a result.
 func (vs *VariableStmt) Accept(visitor Visitor) interface{} {
 	return visitor.VisitVariableStmt(vs)
+}
+
+// WhileStmt ====================================================================
+//
+
+// WhileStmt statement node.
+type WhileStmt struct {
+	Condition Expr
+	Body      Stmt
+}
+
+// NewWhileStmt constructor.
+func NewWhileStmt(condition Expr, body Stmt) *WhileStmt {
+	return &WhileStmt{Condition: condition, Body: body}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (vs *WhileStmt) Accept(visitor Visitor) interface{} {
+	return visitor.VisitWhileStmt(vs)
 }

@@ -138,7 +138,7 @@ func (i *Interpreter) VisitLogicalExpr(expr *ast.Logical) interface{} {
 	} else {
 		if !isTruthy(left) {
 			return left
-		}	
+		}
 	}
 	return i.evaluate(expr.Right)
 }
@@ -224,13 +224,21 @@ func (i *Interpreter) VisitVariableStmt(stmt *ast.VariableStmt) interface{} {
 	return nil
 }
 
+// VisitWhileStmt evaluates the node. See also VisitVarExpr.
+func (i *Interpreter) VisitWhileStmt(stmt *ast.WhileStmt) interface{} {
+	for isTruthy(i.evaluate(stmt.Condition)) {
+		i.evaluate(stmt.Body)
+	}
+	return nil
+}
+
 func (i *Interpreter) executeBlock(stmts []ast.Stmt, newEnvironment *Environment) {
 	previous := i.Environment
 	defer func() {
 		i.Environment = previous
 	}()
 	for _, stmt := range stmts {
-		i.Environment = newEnvironment;
+		i.Environment = newEnvironment
 		i.evaluate(stmt)
 	}
 }

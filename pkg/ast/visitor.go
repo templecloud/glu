@@ -20,4 +20,5 @@ type Visitor interface {
 	VisitIfStmt(stmt *IfStmt) interface{}
 	VisitLogStmt(ps *LogStmt) interface{}
 	VisitVariableStmt(vs *VariableStmt) interface{}
+	VisitWhileStmt(ws *WhileStmt) interface{}
 }

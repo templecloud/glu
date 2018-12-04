@@ -239,3 +239,37 @@ func TestBinary_VarStmt(t *testing.T) {
 		}
 	}
 }
+
+func TestBinary_WhileStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"var x = 0; while (x > 0) { log \"*\"; x = x - 1; }", ""},
+		{"var x = 1; while (x > 0) { log \"*\"; x = x - 1; }", "*"},
+		{"var x = 2; while (x > 0) { log \"*\"; x = x - 1; }", "**"},
+		{"var x = 3; while (x > 0) { log \"*\"; x = x - 1; }", "***"},
+		{"var x = 6; while (x > 0) { log \"*\"; x = x - 1; }", "******"},
+		{"var x = 2 * 5; while (x > 0) { log \"*\"; x = x - 1; }", "**********"},
+		{"var x = 10; while (x > 0) { log \"*\"; x = x - 1; }", "**********"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}

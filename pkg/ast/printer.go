@@ -71,13 +71,13 @@ func (p *Printer) VisitVarExpr(expr *VarExpr) interface{} {
 //
 
 // VisitBlockStmt returns a string representation of the node.
-func (p *Printer) VisitBlockStmt(bs *BlockStmt) interface{} {
+func (p *Printer) VisitBlockStmt(stmt *BlockStmt) interface{} {
 	var builder strings.Builder
 	builder.WriteString("(")
 	builder.WriteString("#bs")
-	for _, stmt := range bs.Stmts {
+	for _, s := range stmt.Stmts {
 		builder.WriteString(" ")
-		builder.WriteString(stmt.Accept(p).(string))
+		builder.WriteString(s.Accept(p).(string))
 	}
 	builder.WriteString(")")
 	return builder.String()
@@ -117,6 +117,19 @@ func (p *Printer) VisitVariableStmt(stmt *VariableStmt) interface{} {
 		return p.parenthesize(nfo, stmt.Initialiser)
 	}
 	return fmt.Sprintf("(#vs %s)", stmt.Name.Lexeme)
+}
+
+// VisitWhileStmt returns a string representation of the node.
+func (p *Printer) VisitWhileStmt(stmt *WhileStmt) interface{} {
+	var builder strings.Builder
+	builder.WriteString("(")
+	builder.WriteString("#ws")
+	builder.WriteString(" ")
+	builder.WriteString(stmt.Condition.Accept(p).(string))
+	builder.WriteString(" ")
+	builder.WriteString(stmt.Body.Accept(p).(string))
+	builder.WriteString(")")
+	return builder.String()
 }
 
 // Support Functions ==========================================================

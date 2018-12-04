@@ -39,7 +39,7 @@ func (p *Parser) ifStatement() ast.Stmt {
 	var elseBranch ast.Stmt
 	if p.match(token.Else) {
 		elseBranch = p.statement()
-	} 
+	}
 	return ast.NewIfStmt(condition, thenBranch, elseBranch)
 }
 
@@ -56,6 +56,9 @@ func (p *Parser) statement() ast.Stmt {
 	if p.match(token.Log) {
 		return p.printStatement()
 	}
+	if p.match(token.While) {
+		return p.whileStatement()
+	}
 	if p.match(token.LeftBrace) {
 		return ast.NewBlockStmt(p.blockStatement())
 	}
@@ -70,4 +73,12 @@ func (p *Parser) varDeclaration() ast.Stmt {
 	}
 	p.consume(token.Semicolon, "Expected ';' after variable declaration.")
 	return ast.NewVariableStmt(name, initialiser)
+}
+
+func (p *Parser) whileStatement() ast.Stmt {
+	p.consume(token.LeftParen, "Expected '(' after while.")
+	condition := p.expression()
+	p.consume(token.RightParen, "Expected ')' after while.")
+	body := p.statement()
+	return ast.NewWhileStmt(condition, body)
 }
