@@ -273,3 +273,34 @@ func TestBinary_WhileStmt(t *testing.T) {
 		}
 	}
 }
+
+func TestBinary_ForStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"for (var i = 0; i < 10; i=i+1) { log i; }", "0123456789"},
+		{"for (var i = 10; i < 20; i=i+1) { log i; }", "10111213141516171819"},
+		{"for (var i = 20; i >= 0; i=i-2) { log i; }", "20181614121086420"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+

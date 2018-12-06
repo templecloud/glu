@@ -11,7 +11,7 @@ import (
 //
 
 func (p *Parser) assignment() ast.Expr {
-	expr := p.or() 
+	expr := p.or()
 	if p.match(token.Equal) {
 		equals := p.previous()
 		value := p.assignment()
@@ -119,7 +119,7 @@ func (p *Parser) primary() ast.Expr {
 	}
 	if p.match(token.LeftParen) {
 		expr := p.expression()
-		p.consume(token.RightParen, "Expect ')' after expression.")
+		p.consume(token.RightParen, "Expected ')' after expression.")
 		return ast.NewGrouping(expr)
 	}
 	panic(NewError(p.tokens[p.current], "Token failed to match any rule."))

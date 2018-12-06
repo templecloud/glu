@@ -40,9 +40,9 @@ func TestParseError_ExprStmt(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"1 + 1", "Expect ';' after expression."},
+		{"1 + 1", "Expected ';' after expression."},
 		{"(1 + ", "Token failed to match any rule."},
-		{"(1 + 1", "Expect ')' after expression."},
+		{"(1 + 1", "Expected ')' after expression."},
 	}
 	for idx, tt := range tests {
 		l := lexer.New(tt.input)

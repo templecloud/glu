@@ -13,7 +13,7 @@ func (p *Parser) blockStatement() []ast.Stmt {
 	for !p.check(token.RightBrace) && !p.isAtEnd() {
 		stmts = append(stmts, p.declaration())
 	}
-	p.consume(token.RightBrace, "Expect '}' after block.")
+	p.consume(token.RightBrace, "Expected '}' after block.")
 	return stmts
 }
 
@@ -27,8 +27,47 @@ func (p *Parser) declaration() ast.Stmt {
 
 func (p *Parser) expressionStatement() ast.Stmt {
 	expr := p.expression()
-	p.consume(token.Semicolon, "Expect ';' after expression.")
+	p.consume(token.Semicolon, "Expected ';' after expression.")
 	return ast.NewExprStmt(expr)
+}
+
+func (p *Parser) forStatement() ast.Stmt {
+	p.consume(token.LeftParen, "Expected '(' after 'for'.")
+	// initialiser
+	var initializer ast.Stmt
+	if p.match(token.Semicolon) {
+		initializer = nil
+	} else if p.match(token.Var) {
+		initializer = p.varDeclaration()
+	} else {
+		initializer = p.expressionStatement()
+	}
+	// condition
+	var condition ast.Expr
+	if !p.check(token.Semicolon) {
+		condition = p.expression()
+	}
+	p.consume(token.Semicolon, "Expected ';' after loop condition.")
+	// incrementor
+	var increment ast.Expr
+	if !p.check(token.RightParen) {
+		increment = p.expression()
+	}
+	p.consume(token.RightParen, "Expected ')' after if condition.")
+
+	// de-sugared statement
+	body := p.statement()
+	if increment != nil {
+		body = ast.NewBlockStmt([]ast.Stmt{body, ast.NewExprStmt(increment)})
+	}
+	if condition == nil {
+		condition = ast.NewLiteral(token.True, true)
+	}
+	body = ast.NewWhileStmt(condition, body)
+	if initializer != nil {
+		body = ast.NewBlockStmt([]ast.Stmt{initializer, body})
+	}
+	return body
 }
 
 func (p *Parser) ifStatement() ast.Stmt {
@@ -50,6 +89,9 @@ func (p *Parser) printStatement() ast.Stmt {
 }
 
 func (p *Parser) statement() ast.Stmt {
+	if p.match(token.For) {
+		return p.forStatement()
+	}
 	if p.match(token.If) {
 		return p.ifStatement()
 	}
