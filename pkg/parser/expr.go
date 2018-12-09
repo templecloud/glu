@@ -62,6 +62,35 @@ func (p *Parser) equality() ast.Expr {
 	return expr
 }
 
+func (p *Parser) call() ast.Expr {
+	expr := p.primary()
+	for true {
+		if p.match(token.LeftParen) {
+			expr = p.finishCall(expr).(ast.Expr)
+		} else {
+			break
+		}
+	}
+	return expr
+}
+
+func (p *Parser) finishCall(callee ast.Expr) interface{} {
+	var arguments []ast.Expr
+	if !p.check(token.RightParen) {
+		arguments = append(arguments, p.expression())
+		for p.match(token.Comma) {
+			if len(arguments) >= 8 {
+				// panic(NewError(p.peek(), "Cannot have more than 8 arguments."))
+				err := NewError(p.peek(), "Cannot have more than 8 arguments.")
+				fmt.Printf("Parse Error: %+v\n", err)
+			}
+			arguments = append(arguments, p.expression())
+		}
+	}
+	paren := p.consume(token.RightParen, "Expect ')' after arguments.")
+	return ast.NewCall(callee, paren, arguments)
+}
+
 func (p *Parser) comparison() ast.Expr {
 	expr := p.addition()
 	for p.match(token.GreaterThan, token.GreaterThanOrEqual, token.LessThan, token.LessThanOrEqual) {
@@ -98,7 +127,7 @@ func (p *Parser) unary() ast.Expr {
 		right := p.unary()
 		return ast.NewUnary(operator, right)
 	}
-	return p.primary()
+	return p.call()
 }
 
 func (p *Parser) primary() ast.Expr {

@@ -51,6 +51,26 @@ func (b *Binary) Accept(visitor Visitor) interface{} {
 	return visitor.VisitBinaryExpr(b)
 }
 
+// Call =======================================================================
+//
+
+// Call expression node.
+type Call struct {
+	Callee    Expr
+	Paren     *token.Token
+	Arguments []Expr
+}
+
+// NewCall constructor.
+func NewCall(callee Expr, paren *token.Token, arguments []Expr) *Call {
+	return &Call{Callee: callee, Paren: paren, Arguments: arguments}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (c *Call) Accept(visitor Visitor) interface{} {
+	return visitor.VisitCallExpr(c)
+}
+
 // Grouping ===================================================================
 //
 

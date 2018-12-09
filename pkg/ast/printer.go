@@ -35,6 +35,11 @@ func (p *Printer) VisitBinaryExpr(expr *Binary) interface{} {
 	return p.parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right)
 }
 
+// VisitCallExpr returns a string representation of the node.
+func (p *Printer) VisitCallExpr(expr *Call) interface{} {
+	return "trjl> TODO"
+}
+
 // VisitGroupingExpr returns a string representation of the node.
 func (p *Printer) VisitGroupingExpr(expr *Grouping) interface{} {
 	return p.parenthesize("#g", expr.Expr)

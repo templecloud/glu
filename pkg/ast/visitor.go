@@ -9,6 +9,7 @@ type Visitor interface {
 	// expressions
 	VisitAssignExpr(a *Assign) interface{}
 	VisitBinaryExpr(b *Binary) interface{}
+	VisitCallExpr(*Call) interface{}
 	VisitGroupingExpr(g *Grouping) interface{}
 	VisitLiteralExpr(l *Literal) interface{}
 	VisitLogicalExpr(l *Logical) interface{}

@@ -107,6 +107,17 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.Binary) interface{} {
 	return nil
 }
 
+// VisitCallExpr evaluates the node.
+func (i *Interpreter) VisitCallExpr(expr *ast.Call) interface{} {
+	callee := i.evaluate(expr.Callee)
+	var arguments []interface{}
+	for _, argument := range expr.Arguments {
+		arguments = append(arguments, i.evaluate(argument))
+	}
+	fn := callee.(GluCallable)
+	return fn.Call(i, arguments)
+}
+
 // VisitGroupingExpr evaluates the node.
 func (i *Interpreter) VisitGroupingExpr(expr *ast.Grouping) interface{} {
 	return i.evaluate(expr.Expr)
