@@ -51,8 +51,8 @@ func TestBinary_BlockExpr(t *testing.T) {
 		{"{var a = 5; log a; { var a = 4; log a; } log a;}", "545"},
 		{"{var a = 5; log a; { a = 4; log a; } log a;}", "544"},
 		{"{var a = \"a\"; log a; { var a = \"a2\"; log a; } log a;}", "aa2a"},
-		{"var a = 5; log a; { var a = 4; log a; } log a;", "5\n45\n"}, // ???
-		{"var a = 5; log a; { a = 4; log a; } log a;", "5\n44\n"},     // ???
+		{"var a = 5; log a; { var a = 4; log a; } log a;", "5\n45\n"}, // TODO: ???
+		{"var a = 5; log a; { a = 4; log a; } log a;", "5\n44\n"},     // TODO: ???
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -107,6 +107,55 @@ func TestBinaryError_BlockExpr(t *testing.T) {
 	}
 }
 
+func TestBinary_CallExpr(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+	cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+	out, err := exec.Command(cmd, "var x = time(); log x;").Output()
+	if err != nil {
+		t.Fatalf("tet[0] Expected no error, Error=%v", err)
+	}
+	actual := string(out)
+	if "" == actual {
+		t.Fatalf("test[0] - Expected result. Actual=%q", actual)
+	}
+}
+
+func TestBinaryError_CallExpr(t *testing.T) {
+	tests := []struct {
+		input          string
+		expectedResult string
+		expectedError  string
+	}{
+		// {"\"non-func\"()", "", "Can only call functions."}, // TODO
+		// {"somefunc(a,b,c,d,e,f,g,h,i)", "", ""}, // TODO
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expectedResult, err)
+		}
+		actual := string(out)
+		if !strings.Contains(actual, tt.expectedResult) {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expectedResult, actual)
+		}
+		if !strings.Contains(actual, tt.expectedError) {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expectedError, actual)
+		}
+	}
+}
 func TestBinary_IfStmt(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -303,4 +352,3 @@ func TestBinary_ForStmt(t *testing.T) {
 		}
 	}
 }
-

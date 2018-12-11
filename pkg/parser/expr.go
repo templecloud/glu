@@ -66,7 +66,7 @@ func (p *Parser) call() ast.Expr {
 	expr := p.primary()
 	for true {
 		if p.match(token.LeftParen) {
-			expr = p.finishCall(expr).(ast.Expr)
+			expr = p._finishCall(expr).(ast.Expr)
 		} else {
 			break
 		}
@@ -74,7 +74,7 @@ func (p *Parser) call() ast.Expr {
 	return expr
 }
 
-func (p *Parser) finishCall(callee ast.Expr) interface{} {
+func (p *Parser) _finishCall(callee ast.Expr) interface{} {
 	var arguments []ast.Expr
 	if !p.check(token.RightParen) {
 		arguments = append(arguments, p.expression())
@@ -87,7 +87,7 @@ func (p *Parser) finishCall(callee ast.Expr) interface{} {
 			arguments = append(arguments, p.expression())
 		}
 	}
-	paren := p.consume(token.RightParen, "Expect ')' after arguments.")
+	paren := p.consume(token.RightParen, "Expected ')' after arguments.")
 	return ast.NewCall(callee, paren, arguments)
 }
 

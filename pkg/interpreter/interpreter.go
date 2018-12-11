@@ -14,13 +14,16 @@ import (
 // Interpreter is an implementation of a Visitor that evaluates the statements
 // and expressions it parses.
 type Interpreter struct {
+	Globals *Environment
 	*Environment
 }
 
 // New creates a Interpeter.
 func New() *Interpreter {
+	globals := defineNativeFunctions()
 	return &Interpreter{
-		Environment: NewGlobalEnvironment(),
+		Environment: globals,
+		Globals:     globals,
 	}
 }
 
@@ -114,7 +117,17 @@ func (i *Interpreter) VisitCallExpr(expr *ast.Call) interface{} {
 	for _, argument := range expr.Arguments {
 		arguments = append(arguments, i.evaluate(argument))
 	}
-	fn := callee.(GluCallable)
+
+	fn, ok := callee.(GluCallable)
+	if !ok {
+		panic(NewError(expr.Paren, "Can only call functions."))
+	}
+
+	if len(arguments) != fn.Arity() {
+		msg := fmt.Sprintf("Expected %d arguments, but, got %d.", fn.Arity(), len(arguments))
+		panic(NewError(expr.Paren, msg))
+	}
+
 	return fn.Call(i, arguments)
 }
 

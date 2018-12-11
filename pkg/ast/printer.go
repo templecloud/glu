@@ -37,7 +37,22 @@ func (p *Printer) VisitBinaryExpr(expr *Binary) interface{} {
 
 // VisitCallExpr returns a string representation of the node.
 func (p *Printer) VisitCallExpr(expr *Call) interface{} {
-	return "trjl> TODO"
+	var builder strings.Builder
+	builder.WriteString("(")
+	builder.WriteString("#call-expr")
+	builder.WriteString(" ")
+	builder.WriteString(expr.Callee.Accept(p).(string))
+	builder.WriteString("(")
+	for idx, a := range expr.Arguments {
+		builder.WriteString(a.Accept(p).(string))
+		if idx < len(expr.Arguments) - 1 {
+			builder.WriteString(", ")
+		}
+
+	}
+	builder.WriteString(")")
+	builder.WriteString(")")
+	return builder.String()
 }
 
 // VisitGroupingExpr returns a string representation of the node.

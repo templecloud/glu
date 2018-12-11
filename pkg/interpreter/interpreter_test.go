@@ -107,6 +107,33 @@ func TestEvaluateError_ExprStmt(t *testing.T) {
 	}
 }
 
+func TestEvaluateError_CallExpr(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"\"some-func\"();", "Can only call functions."},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := parser.New(tokens)
+		stmts := p.Parse()
+		result, evalErr := New().Eval(stmts[0])
+		if result != nil {
+			t.Fatalf("test[%d] - Expected nil result. Expected=%v, Actual=%v",
+				idx, nil, result)
+		}
+		if evalErr == nil {
+			t.Fatalf("test[%d] - Expected error result. Expected=%s, Actual=%s",
+				idx, tt.expected, "nil")
+		}
+		if tt.expected != evalErr.message {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, evalErr)
+		}
+	}
+}
+
 func TestEvaluate_LogStmt(t *testing.T) {
 	tests := []struct {
 		input string
