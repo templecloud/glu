@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/templecloud/glu/pkg/ast"
 	"github.com/templecloud/glu/pkg/token"
 )
@@ -19,6 +21,9 @@ func (p *Parser) blockStatement() []ast.Stmt {
 
 func (p *Parser) declaration() ast.Stmt {
 	// trjl: synchronise here instead?
+	if p.match(token.Func) {
+		return p.fnStatement("function")
+	}
 	if p.match(token.Var) {
 		return p.varDeclaration()
 	}
@@ -29,6 +34,29 @@ func (p *Parser) expressionStatement() ast.Stmt {
 	expr := p.expression()
 	p.consume(token.Semicolon, "Expected ';' after expression.")
 	return ast.NewExprStmt(expr)
+}
+
+func (p *Parser) fnStatement(kind string) ast.Stmt {
+	// Consume function name.
+	name := p.consume(token.Identifier, fmt.Sprintf("Expected kind %s.", kind))
+	// Consume function parameters.
+	p.consume(token.LeftParen, fmt.Sprintf("Expected '(' after kind %s.", kind))
+	var parameters []*token.Token
+	if !p.check(token.RightParen) {
+		parameters = append(parameters, p.consume(token.Identifier, "Expected parameter name."))
+		for p.match(token.Comma) {
+			if len(parameters) >= 8 {
+				err := NewError(p.peek(), "Cannot have more than 8 arguments.")
+				fmt.Printf("Parse Error: %+v\n", err)
+			}
+			parameters = append(parameters, p.consume(token.Identifier, "Expected parameter name."))
+		}
+	}
+	p.consume(token.RightParen, "Expected ')' after arguments.")
+	// Consume function body.
+	p.consume(token.LeftBrace, fmt.Sprintf("Expected '{' before kind %s body.", kind))
+	body := p.blockStatement()
+	return ast.NewFnStmt(name, parameters, body)
 }
 
 func (p *Parser) forStatement() ast.Stmt {

@@ -81,6 +81,51 @@ func TestParseError_ForStmt(t *testing.T) {
 	}
 }
 
+func TestParse_FnStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"func sayHi(name) { log \"Hello, \"; log name; }",
+			"(#fn-stmt sayHi(name) { (#ls \"Hello, \"); (#ls name) })"},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		expr := p.Parse()
+		printer := ast.Printer{}
+		actual := printer.Print(expr[0])
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestParseError_FnStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		// {"func sayHi(name) { log \"Hello, \"; log name; }", "Expect '(' after if condition."},
+		{"func (name) { log \"Hello, \"; log name; }", "Expected kind function."},
+		{"func sayHi name) { log \"Hello, \"; log name; }", "Expected '(' after kind function."},
+		{"func sayHi (name,) { log \"Hello, \"; log name; }", "Expected parameter name."},
+		// {"func sayHi (a,b,c,d,e,f,g,h) { log \"Hello, \"; log name; }", "Cannot have more than 8 arguments."}, // TODO
+		{"func sayHi (name { log \"Hello, \"; log name; }", "Expected ')' after arguments."},
+		{"func sayHi (name) log \"Hello, \"; log name; }", "Expected '{' before kind function body."},
+	}
+	for idx, tt := range tests {
+		l := lexer.New(tt.input)
+		tokens, _ := l.ScanTokens()
+		p := New(tokens)
+		p.Parse()
+		actualErrorMessage := p.Errors[0].message
+		if tt.expected != actualErrorMessage {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actualErrorMessage)
+		}
+	}
+}
 
 func TestParse_IfStmt(t *testing.T) {
 	tests := []struct {

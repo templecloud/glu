@@ -19,6 +19,7 @@ type Visitor interface {
 	VisitBlockStmt(bs *BlockStmt) interface{}
 	VisitExprStmt(es *ExprStmt) interface{}
 	VisitIfStmt(stmt *IfStmt) interface{}
+	VisitFnStmt(fs *FnStmt) interface{}
 	VisitLogStmt(ps *LogStmt) interface{}
 	VisitVariableStmt(vs *VariableStmt) interface{}
 	VisitWhileStmt(ws *WhileStmt) interface{}

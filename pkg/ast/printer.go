@@ -45,10 +45,9 @@ func (p *Printer) VisitCallExpr(expr *Call) interface{} {
 	builder.WriteString("(")
 	for idx, a := range expr.Arguments {
 		builder.WriteString(a.Accept(p).(string))
-		if idx < len(expr.Arguments) - 1 {
+		if idx < len(expr.Arguments)-1 {
 			builder.WriteString(", ")
 		}
-
 	}
 	builder.WriteString(")")
 	builder.WriteString(")")
@@ -106,6 +105,33 @@ func (p *Printer) VisitBlockStmt(stmt *BlockStmt) interface{} {
 // VisitExprStmt returns a string representation of the node.
 func (p *Printer) VisitExprStmt(stmt *ExprStmt) interface{} {
 	return p.parenthesize("#es", stmt.Expr)
+}
+
+// VisitFnStmt returns a string representation of the node.
+func (p *Printer) VisitFnStmt(fn *FnStmt) interface{} {
+	var builder strings.Builder
+	builder.WriteString("(")
+	builder.WriteString("#fn-stmt")
+	builder.WriteString(" ")
+	builder.WriteString(fn.Name.Lexeme)
+	builder.WriteString("(")
+	for idx, param := range fn.Params {
+		builder.WriteString(param.Lexeme)
+		if idx < len(fn.Params)-1 {
+			builder.WriteString(", ")
+		}
+	}
+	builder.WriteString(")")
+	builder.WriteString(" { ")
+	for idx, stmt := range fn.Body {
+		builder.WriteString(stmt.Accept(p).(string))
+		if idx < len(fn.Body)-1 {
+			builder.WriteString("; ")
+		}
+	}
+	builder.WriteString(" }")
+	builder.WriteString(")")
+	return builder.String()
 }
 
 // VisitIfStmt returns a string representation of the node.

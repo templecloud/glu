@@ -80,7 +80,6 @@ func (p *Parser) _finishCall(callee ast.Expr) interface{} {
 		arguments = append(arguments, p.expression())
 		for p.match(token.Comma) {
 			if len(arguments) >= 8 {
-				// panic(NewError(p.peek(), "Cannot have more than 8 arguments."))
 				err := NewError(p.peek(), "Cannot have more than 8 arguments.")
 				fmt.Printf("Parse Error: %+v\n", err)
 			}

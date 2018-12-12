@@ -221,6 +221,13 @@ func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
 	return i.evaluate(stmt.Expr)
 }
 
+// VisitFnStmt evaluates the node.
+func (i *Interpreter) VisitFnStmt(fn *ast.FnStmt) interface{} {
+	function := NewGluFn(fn)
+	i.Environment.Define(fn.Name.Lexeme, function)
+	return nil
+}
+
 // VisitIfStmt evaluates the node.
 func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) interface{} {
 	if isTruthy(i.evaluate(stmt.Condition)) {

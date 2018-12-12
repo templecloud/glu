@@ -51,8 +51,8 @@ func TestBinary_BlockExpr(t *testing.T) {
 		{"{var a = 5; log a; { var a = 4; log a; } log a;}", "545"},
 		{"{var a = 5; log a; { a = 4; log a; } log a;}", "544"},
 		{"{var a = \"a\"; log a; { var a = \"a2\"; log a; } log a;}", "aa2a"},
-		{"var a = 5; log a; { var a = 4; log a; } log a;", "5\n45\n"}, // TODO: ???
-		{"var a = 5; log a; { a = 4; log a; } log a;", "5\n44\n"},     // TODO: ???
+		{"var a = 5; log a; { var a = 4; log a; } log a;", "5\n45\n"},
+		{"var a = 5; log a; { a = 4; log a; } log a;", "5\n44\n"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -156,6 +156,36 @@ func TestBinaryError_CallExpr(t *testing.T) {
 		}
 	}
 }
+
+func TestBinary_FnStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"func sayHi(name) { log \"Hello, \"; log name; } sayHi(\"Tim!\");",
+			"Hello, Tim!"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
 func TestBinary_IfStmt(t *testing.T) {
 	tests := []struct {
 		input    string

@@ -46,7 +46,31 @@ func (es *ExprStmt) Accept(visitor Visitor) interface{} {
 	return visitor.VisitExprStmt(es)
 }
 
-// IfStmt ===================================================================
+// FnStmt =====================================================================
+//
+
+// FnStmt statement node.
+type FnStmt struct {
+	Name   *token.Token
+	Params []*token.Token
+	Body   []Stmt
+}
+
+// NewFnStmt constructor.
+func NewFnStmt(
+	name *token.Token,
+	params []*token.Token,
+	body []Stmt,
+) *FnStmt {
+	return &FnStmt{Name: name, Params: params, Body: body}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (fs *FnStmt) Accept(visitor Visitor) interface{} {
+	return visitor.VisitFnStmt(fs)
+}
+
+// IfStmt =====================================================================
 //
 
 // IfStmt statement node.
