@@ -76,6 +76,11 @@ func (p *Printer) VisitLogicalExpr(expr *Logical) interface{} {
 	return p.parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right)
 }
 
+// VisitReturnExpr returns a string representation of the node.
+func (p *Printer) VisitReturnExpr(expr *Return) interface{} {
+	return p.parenthesize(expr.Keyword.Lexeme, expr.Value)
+}
+
 // VisitUnaryExpr returns a string representation of the node.
 func (p *Printer) VisitUnaryExpr(expr *Unary) interface{} {
 	return p.parenthesize(expr.Operator.Lexeme, expr.Right)

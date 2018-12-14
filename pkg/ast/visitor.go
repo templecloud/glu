@@ -13,6 +13,7 @@ type Visitor interface {
 	VisitGroupingExpr(g *Grouping) interface{}
 	VisitLiteralExpr(l *Literal) interface{}
 	VisitLogicalExpr(l *Logical) interface{}
+	VisitReturnExpr(r *Return) interface{}
 	VisitUnaryExpr(u *Unary) interface{}
 	VisitVarExpr(ve *VarExpr) interface{}
 	// statements

@@ -37,13 +37,30 @@ func (gf GluFn) Arity() int {
 func (gf GluFn) Call(
 	interpreter *Interpreter,
 	arguments []interface{},
-) interface{} {
+) (result interface{}) {
+	// Define a new function environment and set the parameters.
 	environment := NewChildEnvironment(interpreter.Globals)
 	for idx, argument := range arguments {
 		environment.Define(gf.Declaration.Params[idx].Lexeme, argument)
 	}
+	// Set-up a defferred function to handle the dodgy panic based function
+	// return.
+	defer func() {
+		if r := recover(); r != nil {
+			switch res := r.(type) {
+			case *Return:
+				// Dodgy! Catch *Return type structs and return the value.
+				result = res.value
+			case *Error:
+				panic(res)
+			default:
+				panic(res)
+			}
+		}
+	}()
+	// Execute the function block.
 	interpreter.executeBlock(gf.Declaration.Body, environment)
-	return nil
+	return
 }
 
 // Native Functions ===========================================================

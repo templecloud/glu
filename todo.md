@@ -4,6 +4,18 @@ Things to do next.
 
 ---
 
+#### Global
+* Refactor tests to share set-up code.
+* Refactor Expr type names.
+* Collapse separate expr/stmt files into one file.
+* Add file reading.
+* Add function attributes - bash exec mode.
+* Rename fn to func.
+* Mechanism for casting string to and from their natural types.
+* Harmonise printer.
+
+---
+
 #### Lexer
 * Improve representation.
 * Review current Lexemes.
@@ -14,7 +26,7 @@ Things to do next.
 * Add recovery' function.
 * Add more tests.
 * Add 'numeral' node type.
-* Fix crash for non-token
+* Remove log statement and add printing functions.
 
 ---
 
@@ -29,4 +41,5 @@ Things to do next.
 #### Repl
 * Add command line options to configure token and expression output.
 * Add functions to the repl to allow the options to be reconfigured from within
-  the repl. 
+  the repl.
+* Create separate repl and

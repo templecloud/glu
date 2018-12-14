@@ -167,6 +167,16 @@ func (i *Interpreter) VisitLogicalExpr(expr *ast.Logical) interface{} {
 	return i.evaluate(expr.Right)
 }
 
+// VisitReturnExpr evaluates the node.
+func (i *Interpreter) VisitReturnExpr(expr *ast.Return) interface{} {
+	var value interface{}
+	if expr.Value != nil {
+		value = i.evaluate(expr.Value)
+	}
+	// Dodgy as hell but WTF! This fake panic is return the result.
+	panic(NewReturn(value))
+}
+
 // VisitUnaryExpr evaluates the node.
 func (i *Interpreter) VisitUnaryExpr(expr *ast.Unary) interface{} {
 	right := i.evaluate(expr.Right)

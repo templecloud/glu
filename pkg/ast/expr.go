@@ -128,6 +128,25 @@ func (l *Logical) Accept(visitor Visitor) interface{} {
 	return visitor.VisitLogicalExpr(l)
 }
 
+// Return =====================================================================
+//
+
+// Return expression node.
+type Return struct {
+	Keyword *token.Token
+	Value Expr	
+}
+
+// NewReturn constructor.
+func NewReturn(keyword *token.Token, value Expr) *Return {
+	return &Return{Keyword: keyword, Value: value}
+}
+
+// Accept a Vistor that can perform an operation on the node to return a result.
+func (r *Return) Accept(visitor Visitor) interface{} {
+	return visitor.VisitReturnExpr(r)
+}
+
 // Unary ======================================================================
 //
 

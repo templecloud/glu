@@ -6,6 +6,10 @@ import (
 	"github.com/templecloud/glu/pkg/token"
 )
 
+// Error ======================================================================
+//
+
+
 type error interface {
 	Error() string
 }

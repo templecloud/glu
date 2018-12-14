@@ -25,6 +25,10 @@ run: build
 test:
 	go test ./...
 
+.PHONY: v-test
+v-test:
+	go test -v ./...
+
 .PHONY: clean
 clean:
 	rm -Rf $(DIST)

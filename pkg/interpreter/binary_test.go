@@ -81,7 +81,9 @@ func TestBinaryError_BlockExpr(t *testing.T) {
 		expectedResult string
 		expectedError  string
 	}{
-		{"{var a = 5; log a; { var b = 2; log b; var a = 4; log a; } log a; log b;}", "524", "Undefined variable 'b'"},
+		{"{var a = 5; log a; { var b = 2; log b; var a = 4; log a; } log a; log b;}",
+			"524",
+			"Undefined variable 'b'"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -285,6 +287,68 @@ func TestBinary_LogicalStmt(t *testing.T) {
 		actual := string(out)
 		if tt.expected != actual {
 			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestBinary_ReturnStmt(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"'{ func add(a, b) { return a + b; } var c = add(1, 2); log c;}'",
+			"3"},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected no error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expected, err)
+		}
+		actual := string(out)
+		if tt.expected != actual {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expected, actual)
+		}
+	}
+}
+
+func TestBinaryError_ReturnExpr(t *testing.T) {
+	tests := []struct {
+		input          string
+		expectedResult string
+		expectedError  string
+	}{
+		// TODO - This test needs fixing...
+		// {"'func add(a, b) { return a + b }'", "", "Expect ';' after value."},
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to initialise test: %v", err)
+	}
+	pwd = filepath.Dir(filepath.Dir(pwd))
+
+	for idx, tt := range tests {
+		cmd := fmt.Sprintf("%s/%s", pwd, "dist/glu")
+		out, err := exec.Command(cmd, tt.input).Output()
+		if err != nil {
+			t.Fatalf(
+				"test[%d] Expected error - Input=%s, ExpectedValue=%v, Error=%v",
+				idx, tt.input, tt.expectedResult, err)
+		}
+		actual := string(out)
+		if !strings.Contains(actual, tt.expectedResult) {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expectedResult, actual)
+		}
+		if !strings.Contains(actual, tt.expectedError) {
+			t.Fatalf("test[%d] - Expected=%q, Actual=%q", idx, tt.expectedError, actual)
 		}
 	}
 }
