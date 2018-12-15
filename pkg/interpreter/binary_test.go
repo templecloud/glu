@@ -16,10 +16,10 @@ func TestBinary_AssignExpr(t *testing.T) {
 	}{
 		{"var x;", ""},
 		{"var x; x = 1;", ""},
-		{"var x; x = 1; log x;", "1\n"},
-		{"var x = 1; var y = 2; log x + y;", "3\n"},
-		{"var a; a = 1; var b = 3; log a + b;", "4\n"},
-		{"1 + 2; log 3 + 4;", "7\n"},
+		{"var x; x = 1; log x;", "1"},
+		{"var x = 1; var y = 2; log x + y;", "3"},
+		{"var a; a = 1; var b = 3; log a + b;", "4"},
+		{"1 + 2; log 3 + 4;", "7"},
 		{"1 + 2; 3 + 4;", ""},
 	}
 	pwd, err := os.Getwd()
@@ -51,8 +51,8 @@ func TestBinary_BlockExpr(t *testing.T) {
 		{"{var a = 5; log a; { var a = 4; log a; } log a;}", "545"},
 		{"{var a = 5; log a; { a = 4; log a; } log a;}", "544"},
 		{"{var a = \"a\"; log a; { var a = \"a2\"; log a; } log a;}", "aa2a"},
-		{"var a = 5; log a; { var a = 4; log a; } log a;", "5\n45\n"},
-		{"var a = 5; log a; { a = 4; log a; } log a;", "5\n44\n"},
+		{"var a = 5; log a; { var a = 4; log a; } log a;", "545"},
+		{"var a = 5; log a; { a = 4; log a; } log a;", "544"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -227,8 +227,8 @@ func TestBinary_LogStmt(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"log 1 + 1;", "2\n"},
-		{"log \"Hello\";", "Hello\n"},
+		{"log 1 + 1;", "2"},
+		{"log \"Hello\";", "Hello"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -259,11 +259,9 @@ func TestBinary_LogicalStmt(t *testing.T) {
 		{"if (true and true) { log true; }", "true"},
 		{"if (true or true) { log true; }", "true"},
 		{"if (true and true or true) { log true; }", "true"},
-
 		{"if (true and false) { log true; }else { log false; }", "false"},
 		{"if (true or false) { log true; } else { log false; }", "true"},
 		{"if (true and false or false) { log true; } else { log false; }", "false"},
-
 		{"if (true and false) { log true; } else { log false; }", "false"},
 		{"if (true or false) { log true; } else { log false; }", "true"},
 		{"if (false and true or true) { log true; } else { log false; }", "true"},
@@ -358,9 +356,9 @@ func TestBinary_VarStmt(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"var x; log x;", "nil\n"},
-		{"var x = 1 + 1; log x;", "2\n"},
-		{"log x;", "runtime error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n"},
+		{"var x; log x;", "nil"},
+		{"var x = 1 + 1; log x;", "2"},
+		{"log x;", "Runtime error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {

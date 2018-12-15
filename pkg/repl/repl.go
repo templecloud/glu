@@ -61,7 +61,7 @@ func (r *Repl) Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 	for {
 		// Read
-		fmt.Printf(Prompt)
+		fmt.Printf("\n%s", Prompt)
 		ok := scanner.Scan()
 		if !ok {
 			return
@@ -123,7 +123,7 @@ func (r *Repl) Exec(input string) {
 				fmt.Printf("p_err[%d]: ", idx)
 			}
 			if r.config.parseErr {
-				fmt.Printf("%+v\n", parserErr)
+				fmt.Printf("%+v", parserErr)
 			}
 		}
 	} else {
@@ -143,10 +143,10 @@ func (r *Repl) Exec(input string) {
 			result, evalErr := i.Eval(stmt)
 			if evalErr != nil {
 				if r.config.evalErrHeader {
-					fmt.Printf("runtime error: ")
+					fmt.Printf("Runtime error: ")
 				}
 				if r.config.evalErr {
-					fmt.Printf("%v", evalErr)
+					fmt.Printf("%+v", evalErr)
 				}
 			} else {
 				// Result
@@ -154,11 +154,7 @@ func (r *Repl) Exec(input string) {
 					fmt.Printf("result : ")
 				}
 				if r.config.result && result != nil && idx == len(stmts)-1 {
-					fmt.Printf("%v\n", result)
-				} else if strings.HasPrefix(exprStr, "(#ls") {
-					// NB: Small hack to recognise REPL 'log'
-					//     statements.
-					fmt.Println()
+					fmt.Printf("%v", result)
 				}
 			}
 		}

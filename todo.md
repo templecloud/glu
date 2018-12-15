@@ -16,6 +16,7 @@ Things to do next.
 * Replace log statement with NIFs.
 * Implement a debugger.
 * Tidy lexer, parser, interpreter errors.
+* Pretty print parser/interpreter errors.
 
 ---
 
