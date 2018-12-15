@@ -9,6 +9,7 @@ import (
 //
 
 var nilByte = '\000'
+var newLine = '\n'
 var alpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 var digit = regexp.MustCompile(`^[0-9]+$`).MatchString
 

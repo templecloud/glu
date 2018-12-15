@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"strings"
 
 	"github.com/templecloud/glu/pkg/ast"
@@ -23,6 +24,8 @@ const (
 	debugOn = "debug on"
 	// debugOff is a repl command to turn off debugging.
 	debugOff = "debug off"
+	// run is a replc command for running a file.
+	run = "run"
 )
 
 // Repl ===================================================================
@@ -66,15 +69,25 @@ func (r *Repl) Start(in io.Reader, out io.Writer) {
 		input := scanner.Text()
 		if input == exit {
 			return
-		}
-		if input == debugOn {
+		} else if input == debugOn {
 			r.config.debug = fullDebug()
 			continue
-		}
-		if input == debugOff {
+		} else if input == debugOff {
 			r.config.debug = defaultDebug()
 			continue
+		} else if strings.HasPrefix(input, run) {
+			fp := strings.Trim(strings.Replace(input, run, "", 1), " ")
+			if fp != "" {
+				data, err := ioutil.ReadFile(fp)
+				if err != nil {
+					fmt.Println("Failed to open file: ", err)
+				}
+				input = string(data)
+			} else {
+				fmt.Printf("'%s' requires a valid file.\n", run)
+			}
 		}
+
 		r.Exec(input)
 	}
 }

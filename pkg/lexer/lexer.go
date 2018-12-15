@@ -94,7 +94,7 @@ func (l *Lexer) ScanNextToken() (*token.Token, *Error) {
 	case '/':
 		if l.matches('/') {
 			// consume '//' comments.
-			for !l.isAtEnd() && l.peek() != nilByte {
+			for !l.isAtEnd() && l.peek() != newLine && l.peek() != nilByte {
 				l.advance()
 			}
 		} else {

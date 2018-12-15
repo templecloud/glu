@@ -12,7 +12,10 @@ Things to do next.
 * Add function attributes - bash exec mode.
 * Rename fn to func.
 * Mechanism for casting string to and from their natural types.
-* Harmonise printer.
+* Harmonise printer visitor.
+* Replace log statement with NIFs.
+* Implement a debugger.
+* Tidy lexer, parser, interpreter errors.
 
 ---
 
