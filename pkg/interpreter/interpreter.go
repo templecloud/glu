@@ -233,7 +233,7 @@ func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) interface{} {
 
 // VisitFnStmt evaluates the node.
 func (i *Interpreter) VisitFnStmt(fn *ast.FnStmt) interface{} {
-	function := NewGluFn(fn)
+	function := NewGluFn(fn, i.Environment)
 	i.Environment.Define(fn.Name.Lexeme, function)
 	return nil
 }

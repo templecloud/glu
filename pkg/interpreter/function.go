@@ -21,11 +21,12 @@ type GluCallable interface {
 // GluFn represents a function.
 type GluFn struct {
 	Declaration *ast.FnStmt
+	Closure     *Environment
 }
 
 // NewGluFn represents a function.
-func NewGluFn(declaration *ast.FnStmt) *GluFn {
-	return &GluFn{Declaration: declaration}
+func NewGluFn(declaration *ast.FnStmt, environment *Environment) *GluFn {
+	return &GluFn{Declaration: declaration, Closure: environment}
 }
 
 // Arity returns the number of parameters the function has.
@@ -39,7 +40,7 @@ func (gf GluFn) Call(
 	arguments []interface{},
 ) (result interface{}) {
 	// Define a new function environment and set the parameters.
-	environment := NewChildEnvironment(interpreter.Globals)
+	environment := NewChildEnvironment(gf.Closure)
 	for idx, argument := range arguments {
 		environment.Define(gf.Declaration.Params[idx].Lexeme, argument)
 	}
