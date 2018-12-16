@@ -358,7 +358,7 @@ func TestBinary_VarStmt(t *testing.T) {
 	}{
 		{"var x; log x;", "nil"},
 		{"var x = 1 + 1; log x;", "2"},
-		{"log x;", "Runtime error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n"},
+		{"log x;", "Runtime Error: {&{Type:Identifier Lexeme:x Source:{Origin: Line:0 Column:4 Length:1}}, Undefined variable 'x'.}\n"},
 	}
 	pwd, err := os.Getwd()
 	if err != nil {

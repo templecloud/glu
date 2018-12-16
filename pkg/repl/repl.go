@@ -24,6 +24,10 @@ const (
 	debugOn = "debug on"
 	// debugOff is a repl command to turn off debugging.
 	debugOff = "debug off"
+	// debugOn is a repl command to turn on full debugging.
+	ansiOn = "ansi on"
+	// debugOff is a repl command to turn off debugging.
+	ansiOff = "ansi off"	
 	// run is a replc command for running a file.
 	run = "run"
 )
@@ -33,6 +37,7 @@ const (
 
 // Repl is a 'Read Evaluate Print loop' for Glu statements.
 type Repl struct {
+	ansi ANSI
 	config
 	evaluator *interpreter.Interpreter
 }
@@ -40,6 +45,7 @@ type Repl struct {
 // New creates a new default Repl.
 func New() *Repl {
 	return &Repl{
+		ansi:      NewANSI(true),
 		config:    defaultConfig(),
 		evaluator: interpreter.New(),
 	}
@@ -48,6 +54,7 @@ func New() *Repl {
 // NewCmd creates a new command Repl.
 func NewCmd() *Repl {
 	return &Repl{
+		ansi:      NewANSI(false),
 		config:    cmdConfig(),
 		evaluator: interpreter.New(),
 	}
@@ -75,6 +82,12 @@ func (r *Repl) Start(in io.Reader, out io.Writer) {
 		} else if input == debugOff {
 			r.config.debug = defaultDebug()
 			continue
+		} else if input == ansiOn {
+			r.ansi = NewANSI(true)
+			continue
+		} else if input == ansiOff {
+			r.ansi = NewANSI(false)
+			continue
 		} else if strings.HasPrefix(input, run) {
 			fp := strings.Trim(strings.Replace(input, run, "", 1), " ")
 			if fp != "" {
@@ -87,7 +100,6 @@ func (r *Repl) Start(in io.Reader, out io.Writer) {
 				fmt.Printf("'%s' requires a valid file.\n", run)
 			}
 		}
-
 		r.Exec(input)
 	}
 }
@@ -99,18 +111,20 @@ func (r *Repl) Exec(input string) {
 	tokens, errors := l.ScanTokens()
 	for idx, token := range tokens {
 		if r.config.tokenHeader {
-			fmt.Printf("token[%d]: ", idx)
+			header := fmt.Sprintf("Token [%d]: ", idx)
+			fmt.Printf("%s", r.ansi.brightBlue(header))
 		}
 		if r.config.token {
-			fmt.Printf("%+v\n", token)
+			fmt.Printf("%s\n", r.ansi.blue(token))
 		}
 	}
 	for idx, tokenErr := range errors {
 		if r.config.tokenErrHeader {
-			fmt.Printf("t_err[%d]: ", idx)
+			header := fmt.Sprintf("Token Error [%d]: ", idx)
+			fmt.Printf("%s", r.ansi.brightRed(header))
 		}
 		if r.config.tokenErr {
-			fmt.Printf("%+v\n", tokenErr)
+			fmt.Printf("%s\n", r.ansi.red(tokenErr))
 		}
 	}
 
@@ -120,22 +134,24 @@ func (r *Repl) Exec(input string) {
 	if len(p.Errors) > 0 {
 		for idx, parserErr := range p.Errors {
 			if r.config.parseErrHeader {
-				fmt.Printf("p_err[%d]: ", idx)
+				header := fmt.Sprintf("Parse Error [%d]: ", idx)
+				fmt.Printf("%s", r.ansi.brightRed(header))
 			}
 			if r.config.parseErr {
-				fmt.Printf("%+v", parserErr)
+				fmt.Printf("%s\n", r.ansi.red(parserErr))
 			}
 		}
 	} else {
 		for idx, stmt := range stmts {
 			// Print
 			printer := ast.Printer{}
-			exprStr := printer.Print(stmt)
+			representation := printer.Print(stmt)
 			if r.config.exprHeader {
-				fmt.Printf("expr   :")
+				header := fmt.Sprintf("Parsed Input: ")
+				fmt.Printf("%s", r.ansi.brightMagenta(header))
 			}
 			if r.config.expr {
-				fmt.Printf("%s\n", exprStr)
+				fmt.Printf("%s\n", r.ansi.magenta(representation))
 			}
 
 			// Evaluate
@@ -143,18 +159,20 @@ func (r *Repl) Exec(input string) {
 			result, evalErr := i.Eval(stmt)
 			if evalErr != nil {
 				if r.config.evalErrHeader {
-					fmt.Printf("Runtime error: ")
+					header := fmt.Sprintf("Runtime Error: ")
+					fmt.Printf("%s", r.ansi.brightRed(header))
 				}
 				if r.config.evalErr {
-					fmt.Printf("%+v", evalErr)
+					fmt.Printf("%s", r.ansi.red(evalErr))
 				}
 			} else {
 				// Result
 				if r.config.resultHeader {
-					fmt.Printf("result : ")
+					// TODO: Tidy this up?
+					// fmt.Printf("result : ")
 				}
 				if r.config.result && result != nil && idx == len(stmts)-1 {
-					fmt.Printf("%v", result)
+					fmt.Printf("%v", r.ansi.green(result))
 				}
 			}
 		}
