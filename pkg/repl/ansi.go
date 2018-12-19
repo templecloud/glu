@@ -38,7 +38,7 @@ func NewANSI(enabled bool) ANSI {
 
 func (a *ANSI) apply(ansi string, target interface{}) string {
 	if a.Enabled {
-		return fmt.Sprintf("%s%#v%s", ansi, target, reset)
+		return fmt.Sprintf("%s%+v%s", ansi, target, reset)
 	}
 	return fmt.Sprintf("%+v", target)
 }

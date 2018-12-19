@@ -28,7 +28,7 @@ const (
 	ansiOn = "ansi on"
 	// debugOff is a repl command to turn off debugging.
 	ansiOff = "ansi off"	
-	// run is a replc command for running a file.
+	// run is a repl command for running a file.
 	run = "run"
 )
 
@@ -138,8 +138,15 @@ func (r *Repl) Exec(input string) {
 				fmt.Printf("%s", r.ansi.brightRed(header))
 			}
 			if r.config.parseErr {
-				fmt.Printf("%s\n", r.ansi.red(parserErr))
+				fmt.Printf("%s\n", r.ansi.red(parserErr.Error()))
 			}
+			// if r.config.parseErrHeader {
+			// 	header := fmt.Sprintf("Parse Error [%d]: ", idx)
+			// 	fmt.Printf("%s", header)
+			// }
+			// if r.config.parseErr {
+			// 	fmt.Printf("%s\n", parserErr.Error())
+			// }			
 		}
 	} else {
 		for idx, stmt := range stmts {

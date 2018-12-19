@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/templecloud/glu/pkg/token"
 )
@@ -22,5 +23,23 @@ func NewError(token *token.Token, message string) *Error {
 }
 
 func (e Error) Error() string {
-	return fmt.Sprintf("{%+v, %s}\n", e.token, e.message)
+	var builder strings.Builder
+
+	if e.token.Source.Origin != "" {
+		builder.WriteString(e.token.Source.Origin)
+		builder.WriteString(" ")
+	}
+
+	builder.WriteString(fmt.Sprintf(e.message))
+	builder.WriteString(" ")
+
+	loc := fmt.Sprintf("At Line: %d, Column: %d", e.token.Source.Line+1, e.token.Source.Column+1)
+	builder.WriteString(loc)
+	builder.WriteString(", ")
+
+	lex := fmt.Sprintf("Token: {%s: '%s'}.", e.token.Type, e.token.Lexeme)
+	builder.WriteString(lex)
+	builder.WriteString(" ")
+	
+	return builder.String()
 }
