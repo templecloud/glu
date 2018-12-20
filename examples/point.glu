@@ -1,0 +1,19 @@
+// Point - A simple point like structure.
+//
+// Demonstrates closure support for object like structures.
+//
+
+func makePoint(x, y) {
+  func closure(method) {
+    if (method == "x") return x;
+    if (method == "y") return y;
+    log "unknown method";
+  }
+
+  return closure;
+}
+
+var point = makePoint(2, 3);
+log point("x"); // "2".
+log point("y"); // "3".
+

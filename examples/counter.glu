@@ -1,0 +1,22 @@
+// Counter - A simple integer counter.
+//
+// Demonstrates closure support.
+//
+
+// Create a closure capturing 'i' in the returned 'count' function.
+func makeCounter() {
+  var i = 0;
+  func count() {
+    i = i + 1;
+    log i;
+  }
+
+  return count;
+}
+
+
+// Do some counting!
+//
+var counter = makeCounter();
+counter(); // "1".
+counter(); // "2".
