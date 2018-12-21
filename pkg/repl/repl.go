@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/templecloud/glu/pkg/analysis"
 	"github.com/templecloud/glu/pkg/ast"
 	"github.com/templecloud/glu/pkg/interpreter"
 	"github.com/templecloud/glu/pkg/lexer"
@@ -27,7 +28,7 @@ const (
 	// debugOn is a repl command to turn on full debugging.
 	ansiOn = "ansi on"
 	// debugOff is a repl command to turn off debugging.
-	ansiOff = "ansi off"	
+	ansiOff = "ansi off"
 	// run is a repl command for running a file.
 	run = "run"
 )
@@ -140,15 +141,18 @@ func (r *Repl) Exec(input string) {
 			if r.config.parseErr {
 				fmt.Printf("%s\n", r.ansi.red(parserErr.Error()))
 			}
-			// if r.config.parseErrHeader {
-			// 	header := fmt.Sprintf("Parse Error [%d]: ", idx)
-			// 	fmt.Printf("%s", header)
-			// }
-			// if r.config.parseErr {
-			// 	fmt.Printf("%s\n", parserErr.Error())
-			// }			
 		}
 	} else {
+
+		// trjl
+
+		// analysis.NewResolver(r.evaluator)
+		resolver := analysis.NewResolver(r.evaluator)
+		resolver.Resolve(stmts)
+
+		// trjl check for errors
+		// if (hadError) return;
+
 		for idx, stmt := range stmts {
 			// Print
 			printer := ast.Printer{}

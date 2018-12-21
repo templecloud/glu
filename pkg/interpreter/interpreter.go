@@ -15,15 +15,18 @@ import (
 // and expressions it parses.
 type Interpreter struct {
 	Globals *Environment
+	Locals  map[ast.Expr]int
 	*Environment
 }
 
 // New creates a Interpeter.
 func New() *Interpreter {
 	globals := defineNativeFunctions()
+	locals := make(map[ast.Expr]int)
 	return &Interpreter{
 		Environment: globals,
 		Globals:     globals,
+		Locals:      locals,
 	}
 }
 
@@ -55,6 +58,20 @@ func (i *Interpreter) evaluate(stmt ast.Stmt) interface{} {
 	return stmt.Accept(i)
 }
 
+// trjl
+func (i *Interpreter) Resolve(stmt ast.Stmt, depth int) {
+	i.Locals[stmt] = depth
+}
+
+// trjl
+func (i *Interpreter) lookUpVariable(name *token.Token, stmt ast.Stmt) interface{} {
+    distance := i.Locals[stmt]
+    if distance != -1 {
+		return i.Environment.GetAt(distance, name.Lexeme) 
+	}
+	return i.Globals.Get(name)
+}
+
 // Expression Functions =======================================================
 //
 
@@ -63,7 +80,23 @@ func (i *Interpreter) evaluate(stmt ast.Stmt) interface{} {
 // expressions.
 func (i *Interpreter) VisitAssignExpr(expr *ast.Assign) interface{} {
 	value := i.evaluate(expr.Value)
-	i.Environment.Assign(expr.Name, value)
+	// TODO> trjli
+	// i.Environment.Assign(expr.Name, value)
+    distance := i.Locals[expr]
+    if distance != -1 {
+		i.Environment.AssignAt(distance, expr.Name.Lexeme, value) 
+	} else {
+		i.Globals.Assign(expr.Name, value)
+	}
+
+	//     Integer distance = locals.get(expr);               
+    // if (distance != null) {                            
+    //   environment.assignAt(distance, expr.name, value);
+    // } else {                                           
+    //   globals.assign(expr.name, value);                
+    // }                                                  
+
+
 	return value
 }
 
@@ -192,7 +225,9 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.Unary) interface{} {
 
 // VisitVarExpr evaluates the node.
 func (i *Interpreter) VisitVarExpr(ve *ast.VarExpr) interface{} {
-	return i.Environment.Get(ve.Name)
+	// TODO: Remove trjl
+	// return i.Environment.Get(ve.Name)
+	return i.lookUpVariable(ve.Name, ve)
 }
 
 // Expr Runtime Error Functions ===============================================

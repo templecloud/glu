@@ -38,6 +38,16 @@ func (env *Environment) Assign(name *token.Token, value interface{}) {
 	}
 }
 
+// trjl
+// func (env *Environment) AssignAt(distance int, name *token.Token, value interface{}) {
+// 	env.ancestor(distance).Values[name.lexeme] = value
+// }
+
+func (env *Environment) AssignAt(distance int, name string, value interface{}) {
+	env.ancestor(distance).Values[name] = value
+}
+
+
 // Define adds a new variable to the environment.
 func (env *Environment) Define(name string, value interface{}) {
 	env.Values[name] = value
@@ -53,4 +63,21 @@ func (env *Environment) Get(name *token.Token) interface{} {
 	}
 	err := fmt.Sprintf("Undefined variable '%s'.", name.Lexeme)
 	panic(NewError(name, err))
+}
+
+// trjl
+// GetAt attempts to retrieve the specified environment variable from 
+// the distance specified 'Parent' environment.
+func (env *Environment) GetAt(distance int, name string) interface{} {
+	return env.ancestor(distance).Values[name]
+}
+
+// trjl
+//ancestor return the specified 'ancestor' (nth Parent) environment.
+func (env *Environment) ancestor(n int) *Environment {
+	environment := env
+	for i := 0; i < n; i++ {
+		environment = environment.Parent
+	}
+	return environment
 }
